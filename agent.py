@@ -11,7 +11,7 @@ from typing import Optional, Tuple
 
 from opencode_ai import AsyncOpencode
 
-from client_opencode import create_client, create_session, send_prompt
+from client import create_client, create_session, send_prompt
 from progress import print_session_header, print_progress_summary
 from prompts import get_initializer_prompt, get_coding_prompt, copy_spec_to_project
 

@@ -8,8 +8,8 @@ This script implements the two-agent pattern (initializer + coding agent) and
 incorporates all the strategies from the long-running agents guide.
 
 Example Usage:
-    python autonomous_agent_demo_opencode.py --project-dir ./my_project
-    python autonomous_agent_demo_opencode.py --project-dir ./my_project --max-iterations 5
+    python autonomous_agent_demo.py --project-dir ./my_project
+    python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 5
 """
 
 import argparse
@@ -17,7 +17,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from agent_opencode import run_autonomous_agent
+from agent import run_autonomous_agent
 
 
 # Configuration
@@ -32,16 +32,16 @@ def parse_args() -> argparse.Namespace:
         epilog="""
 Examples:
   # Start fresh project
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project
+  python autonomous_agent_demo.py --project-dir ./my_project
 
   # Use a specific model
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project --model anthropic/claude-3-5-sonnet-20241022
+  python autonomous_agent_demo.py --project-dir ./my_project --model anthropic/claude-3-5-sonnet-20241022
 
   # Limit iterations for testing
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project --max-iterations 5
+  python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 5
 
   # Continue existing project
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project
+  python autonomous_agent_demo.py --project-dir ./my_project
 
 Environment Variables:
   ANTHROPIC_API_KEY    Your Anthropic API key (required)
