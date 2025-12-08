@@ -1,1 +1,5 @@
-claude-code-sdk>=0.0.25
+# OpenCode Python SDK (ersetzt claude-code-sdk)
+opencode-ai>=0.1.0
+
+# Legacy (wird entfernt nach Migration)
+# claude-code-sdk>=0.0.25

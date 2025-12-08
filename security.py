@@ -1,13 +1,14 @@
 """
-Security Hooks for Autonomous Coding Agent
-==========================================
+Security Configuration for Autonomous Coding Agent
+==============================================
 
-Pre-tool-use hooks that validate bash commands for security.
+Security configuration for both Claude Code SDK and OpenCode.
 Uses an allowlist approach - only explicitly permitted commands can run.
 """
 
 import os
 import shlex
+from pathlib import Path
 
 
 # Allowed commands for development tasks
@@ -354,6 +355,58 @@ async def bash_security_hook(input_data, tool_use_id=None, context=None):
             elif cmd == "init.sh":
                 allowed, reason = validate_init_script(cmd_segment)
                 if not allowed:
-                    return {"decision": "block", "reason": reason}
-
+                return {"decision": "block", "reason": reason}
+  
     return {}
+
+
+def get_opencode_permissions(project_dir: Path) -> dict:
+    """
+    Convert Claude SDK security settings to OpenCode permissions format.
+    
+    Args:
+        project_dir: Project directory path
+        
+    Returns:
+        OpenCode permissions configuration
+    """
+    return {
+        "allow": [
+            # Allow all file operations within the project directory
+            f"Read({project_dir.resolve()}/**)",
+            f"Write({project_dir.resolve()}/**)",
+            f"Edit({project_dir.resolve()}/**)",
+            f"Glob({project_dir.resolve()}/**)",
+            f"Grep({project_dir.resolve()}/**)",
+            # Bash permission granted here, but actual commands are validated
+            # by bash_security_hook (see ALLOWED_COMMANDS above)
+            "Bash(*)",
+        ],
+        "defaultMode": "acceptEdits",  # Auto-approve edits within allowed directories
+    }
+
+
+def get_opencode_permissions(project_dir: Path) -> dict:
+    """
+    Convert Claude SDK security settings to OpenCode permissions format.
+    
+    Args:
+        project_dir: Project directory path
+        
+    Returns:
+        OpenCode permissions configuration
+    """
+    return {
+        "allow": [
+            # Allow all file operations within the project directory
+            f"Read({project_dir.resolve()}/**)",
+            f"Write({project_dir.resolve()}/**)",
+            f"Edit({project_dir.resolve()}/**)",
+            f"Glob({project_dir.resolve()}/**)",
+            f"Grep({project_dir.resolve()}/**)",
+            # Bash permission granted here, but actual commands are validated
+            # by bash_security_hook (see ALLOWED_COMMANDS above)
+            "Bash(*)",
+        ],
+        "defaultMode": "acceptEdits",  # Auto-approve edits within allowed directories
+    }
