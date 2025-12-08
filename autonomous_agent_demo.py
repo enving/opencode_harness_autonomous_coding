@@ -43,8 +43,9 @@ Examples:
   # Continue existing project
   python autonomous_agent_demo.py --project-dir ./my_project
 
-Environment Variables:
-  ANTHROPIC_API_KEY    Your Anthropic API key (required)
+ Environment Variables:
+   ANTHROPIC_API_KEY    Your Anthropic API key (for Claude models)
+   OPENROUTER_API_KEY   Your OpenRouter API key (for multiple models)
         """,
     )
 
@@ -76,12 +77,19 @@ def main() -> None:
     """Main entry point."""
     args = parse_args()
 
-    # Check for API key
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("Error: ANTHROPIC_API_KEY environment variable not set")
-        print("\nGet your API key from: https://console.anthropic.com/")
-        print("\nThen set it:")
-        print("  export ANTHROPIC_API_KEY='your-api-key-here'")
+    # Check for API key (support multiple providers)
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+    openrouter_key = os.environ.get("OPENROUTER_API_KEY")
+    
+    if not anthropic_key and not openrouter_key:
+        print("Error: No API key found. Set either ANTHROPIC_API_KEY or OPENROUTER_API_KEY")
+        print("\nOptions:")
+        print("  1. Anthropic API key (Claude models):")
+        print("     $env:ANTHROPIC_API_KEY='your-api-key-here'")
+        print("     Get key from: https://console.anthropic.com/")
+        print("\n  2. OpenRouter API key (multiple models):")
+        print("     $env:OPENROUTER_API_KEY='your-api-key-here'")
+        print("     Get key from: https://openrouter.ai/")
         return
 
     # Use project directory as specified

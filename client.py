@@ -31,35 +31,31 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     2. Security rules - Bash commands validated against an allowlist
        (see security.py for ALLOWED_COMMANDS)
     """
-    # Check for API key (support both Anthropic and generated keys)
-    api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENCODE_API_KEY")
-    if not api_key:
-        # Try to use OpenCode's recommended free models first
+    # Check for API key (support multiple providers)
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+    openrouter_key = os.environ.get("OPENROUTER_API_KEY")
+    
+    if not anthropic_key and not openrouter_key:
         print("🔑 No API key found!")
         print("💡 Options:")
         print("   1. Set ANTHROPIC_API_KEY for Claude models")
-        print("   2. Set OPENCODE_API_KEY for OpenCode recommended models")
-        print("   3. Or use OpenCode's free models (no key required)")
-        print()
-        print("🌟 Recommended: Set OPENCODE_API_KEY to access free models!")
-        print("   OpenCode will automatically select optimal free models.")
+        print("   2. Set OPENROUTER_API_KEY for OpenRouter models")
         print()
         return None
     
     # Determine model strategy
     if model == "auto":
-        if "OPENCODE_API_KEY" in os.environ:
-            model_strategy = "auto"  # Let OpenCode choose optimal free model
-            print(f"🚀 Using OpenCode auto-selected model (free tier)")
-        else:
+        if openrouter_key:
+            model_strategy = "openrouter/anthropic/claude-3.5-sonnet"  # Default OpenRouter model
+            print(f"🚀 Using OpenRouter Claude 3.5 Sonnet")
+        elif anthropic_key:
             model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
             print(f"🤖 Using Claude Sonnet 3.5 (paid tier)")
-    elif "OPENCODE_API_KEY" in os.environ:
-        model_strategy = "auto"  # Force auto-selection for OpenCode key
-        print(f"🚀 Using OpenCode auto-selected model (free tier)")
+        else:
+            model_strategy = "auto"  # Fallback to auto-selection
+            print(f"🎯 Using auto-selected model")
     else:
         # Use specified model
-        provider, model_id = model.split("/", 1)
         model_strategy = model
         print(f"🎯 Using specified model: {model}")
     
@@ -67,11 +63,8 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     
     # Create OpenCode client
     try:
-        client = AsyncOpencode(
-            # Base URL can be configured via OPENCODE_BASE_URL env var
-            # Default: http://localhost:4096
-            api_key=api_key  # Pass the determined API key
-        )
+        client = AsyncOpencode()
+        print(f"✅ OpenCode client created successfully")
     except Exception as e:
         print(f"❌ Failed to create OpenCode client: {e}")
         return None
@@ -153,12 +146,18 @@ async def send_prompt(
             # Let OpenCode choose the optimal model
             model_config = {}  # OpenCode will auto-select
         else:
-            # Use specified model
-            provider, model_id = model.split("/", 1)
-            model_config = {
-                "providerID": provider,
-                "modelID": model_id
-            }
+            # Use specified model (format: provider/model)
+            if "/" in model:
+                provider, model_id = model.split("/", 1)
+                model_config = {
+                    "providerID": provider,
+                    "modelID": model_id
+                }
+            else:
+                # If no provider specified, use as model ID
+                model_config = {
+                    "modelID": model
+                }
         
         result = await client.session.prompt({
             "path": {"id": session_id},
