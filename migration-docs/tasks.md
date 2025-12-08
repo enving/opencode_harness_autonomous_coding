@@ -1,12 +1,59 @@
-# Migration Task List
+# 🎉 AKTUALISIERT: Migration Task List (Python SDK!)
 
-## Phase 1: Grundlagen schaffen ✅
+## Phase 1: SDK Austausch (Python → Python)
 
-- [x] 1.1 Git Repository initialisieren
-- [x] 1.2 Package.json erstellen  
-- [x] 1.3 TypeScript Setup
-- [x] 1.4 Projektstruktur anlegen
-- [ ] 1.5 OpenCode SDK installieren
+### 1.1 OpenCode Python SDK installieren
+- [ ] `pip install --pre opencode-ai`
+- [ ] requirements.txt aktualisieren
+- [ ] Importe testen
+
+### 1.2 Client.py neu implementieren
+- [ ] OpenCode Client anstelle von Claude SDK
+- [ ] API-Aufrufe umwandeln
+- [ ] Session-Management anpassen
+- [ ] Error handling übernehmen
+
+### 1.3 Security.py anpassen
+- [ ] Bash allowlist → OpenCode Permissions
+- [ ] Sandbox-Konfiguration übernehmen
+- [ ] Security hooks anpassen
+
+## Phase 2: Core Components anpassen
+
+### 2.1 Agent.py anpassen
+- [ ] Session-Handling mit OpenCode API
+- [ ] Response-Handling anpassen
+- [ ] Async patterns beibehalten
+- [ ] Error handling übernehmen
+
+### 2.2 Progress.py minimal anpassen
+- [ ] OpenCode-spezifische Ausgaben
+- [ ] Session-Status anzeigen
+- [ ] Fortschritts-Tracking beibehalten
+
+### 2.3 Main entry point anpassen
+- [ ] autonomous_agent_demo.py minimal anpassen
+- [ ] CLI Argumente beibehalten
+- [ ] Error handling aktualisieren
+
+## Phase 3: Testing & Integration
+
+### 3.1 Funktionalität testen
+- [ ] Autonomous agent workflow
+- [ ] Zwei-Agenten-Muster
+- [ ] Security model
+- [ ] Session management
+
+### 3.2 Performance & Polish
+- [ ] Performance optimieren
+- [ ] Logging verbessern
+- [ ] Dokumentation anpassen
+- [ ] README aktualisieren
+
+---
+
+**Aktueller Status**: Python SDK entdeckt! Migration vereinfacht! 🚀  
+**Nächster Schritt**: OpenCode Python SDK installieren
 
 ## Phase 2: Core Components migrieren
 
