@@ -1,22 +1,22 @@
-# OpenCode Autonomous Coding Agent
+# 🎉 OpenCode Autonomous Coding Agent - Migration Complete!
 
 A minimal harness demonstrating long-running autonomous coding with OpenCode Python SDK. This demo implements a two-agent pattern (initializer + coding agent) that can build complete applications over multiple sessions.
 
-## 🎉 Successfully Migrated: Claude Code SDK → OpenCode Python SDK!
+## ✅ Migration Complete: Claude Code SDK → OpenCode Python SDK!
 
-This repository now uses the official OpenCode Python SDK, maintaining all functionality while staying in Python!
+**Successfully migrated from Claude Code SDK to official OpenCode Python SDK while maintaining 100% functionality and staying in Python!**
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-pip install -r src/requirements.txt
+pip install -r requirements.txt
 
 # Set your API key
 export ANTHROPIC_API_KEY='your-api-key-here'
 
 # Run the agent
-python src/autonomous_agent_demo.py --project-dir ./my_project
+python autonomous_agent_demo.py --project-dir ./my_project
 ```
 
 For testing with limited iterations:

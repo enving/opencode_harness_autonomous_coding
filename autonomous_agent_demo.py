@@ -21,7 +21,7 @@ from agent import run_autonomous_agent
 
 
 # Configuration
-DEFAULT_MODEL = "anthropic/claude-3-5-sonnet-20241022"
+DEFAULT_MODEL = "auto"  # Auto-select optimal model (free tier with OpenCode key)
 
 
 def parse_args() -> argparse.Namespace:
