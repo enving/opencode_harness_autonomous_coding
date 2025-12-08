@@ -35,11 +35,12 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
     
-    if not anthropic_key and not openrouter_key:
-        print("ðŸ”‘ No API key found!")
-        print("ðŸ’¡ Options:")
+    if not anthropic_key and not openrouter_key and not opencode_key:
+        print("🔑 No API key found!")
+        print("💡 Options:")
         print("   1. Set ANTHROPIC_API_KEY for Claude models")
         print("   2. Set OPENROUTER_API_KEY for OpenRouter models")
+        print("   3. Set OPENCODE_API_KEY for OpenCode Zen models")
         print()
         return None
     

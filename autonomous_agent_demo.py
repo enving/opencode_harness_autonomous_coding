@@ -81,7 +81,7 @@ def main() -> None:
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
     
-    if not anthropic_key and not openrouter_key:
+    if not anthropic_key and not openrouter_key and not opencode_key:
         print("Error: No API key found. Set either ANTHROPIC_API_KEY or OPENROUTER_API_KEY")
         print("\nOptions:")
         print("  1. Anthropic API key (Claude models):")
@@ -90,6 +90,12 @@ def main() -> None:
         print("\n  2. OpenRouter API key (multiple models):")
         print("     $env:OPENROUTER_API_KEY='your-api-key-here'")
         print("     Get key from: https://openrouter.ai/")
+        print("\n  3. OpenCode API key (free models):")
+        print("     $env:OPENCODE_API_KEY='your-api-key-here'")
+        print("     Get key from: https://opencode.ai/auth")
+        print("\n  3. OpenCode API key (free models):")
+        print("     $env:OPENCODE_API_KEY='your-api-key-here'")
+        print("     Get key from: https://opencode.ai/auth")
         return
 
     # Use project directory as specified
@@ -114,3 +120,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
