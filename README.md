@@ -1,39 +1,49 @@
-# Autonomous Coding Agent Demo
+# OpenCode Autonomous Coding Agent
 
-A minimal harness demonstrating long-running autonomous coding with the Claude Agent SDK. This demo implements a two-agent pattern (initializer + coding agent) that can build complete applications over multiple sessions.
+A minimal harness demonstrating long-running autonomous coding with OpenCode Python SDK. This demo implements a two-agent pattern (initializer + coding agent) that can build complete applications over multiple sessions.
 
-## Prerequisites
+## 🎉 Successfully Migrated: Claude Code SDK → OpenCode Python SDK!
 
-**Required:** Install the latest versions of both Claude Code and the Claude Agent SDK:
-
-```bash
-# Install Claude Code CLI (latest version required)
-npm install -g @anthropic-ai/claude-code
-
-# Install Python dependencies
-pip install -r requirements.txt
-```
-
-Verify your installations:
-```bash
-claude --version  # Should be latest version
-pip show claude-code-sdk  # Check SDK is installed
-```
-
-**API Key:** Set your Anthropic API key:
-```bash
-export ANTHROPIC_API_KEY='your-api-key-here'
-```
+This repository now uses the official OpenCode Python SDK, maintaining all functionality while staying in Python!
 
 ## Quick Start
 
 ```bash
-python autonomous_agent_demo.py --project-dir ./my_project
+# Install dependencies
+pip install -r src/requirements.txt
+
+# Set your API key
+export ANTHROPIC_API_KEY='your-api-key-here'
+
+# Run the agent
+python src/autonomous_agent_demo.py --project-dir ./my_project
 ```
 
 For testing with limited iterations:
 ```bash
-python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
+python src/autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
+```
+
+## Project Structure
+
+```
+opencode-harness-autonomous-coding/
+├── src/
+│   ├── agent.py              # OpenCode agent session logic
+│   ├── client.py             # OpenCode client configuration
+│   ├── security.py           # Security rules and permissions
+│   ├── progress.py           # Progress tracking utilities
+│   ├── prompts.py            # Prompt loading utilities
+│   ├── autonomous_agent_demo.py # Main entry point
+│   ├── requirements.txt       # Python dependencies
+│   ├── tests/               # Test files
+│   └── [config files]       # TypeScript/Node.js configs (legacy)
+├── prompts/                 # Agent prompts
+│   ├── app_spec.txt          # Application specification
+│   ├── initializer_prompt.md # First session prompt
+│   └── coding_prompt.md      # Continuation session prompt
+├── legacy/                  # Original Claude SDK files
+└── migration-docs/          # Migration documentation
 ```
 
 ## Important Timing Expectations
@@ -45,8 +55,6 @@ python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
 - **Subsequent sessions:** Each coding iteration can take **5-15 minutes** depending on complexity.
 
 - **Full app:** Building all 200 features typically requires **many hours** of total runtime across multiple sessions.
-
-**Tip:** The 200 features parameter in the prompts is designed for comprehensive coverage. If you want faster demos, you can modify `prompts/initializer_prompt.md` to reduce the feature count (e.g., 20-50 features for a quicker demo).
 
 ## How It Works
 
@@ -65,55 +73,31 @@ python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
 
 ## Security Model
 
-This demo uses a defense-in-depth security approach (see `security.py` and `client.py`):
+This demo uses a defense-in-depth security approach:
 
-1. **OS-level Sandbox:** Bash commands run in an isolated environment
-2. **Filesystem Restrictions:** File operations restricted to the project directory only
-3. **Bash Allowlist:** Only specific commands are permitted:
+1. **Permissions:** File operations restricted to project directory only
+2. **Bash Allowlist:** Only specific commands are permitted:
    - File inspection: `ls`, `cat`, `head`, `tail`, `wc`, `grep`
    - Node.js: `npm`, `node`
    - Version control: `git`
    - Process management: `ps`, `lsof`, `sleep`, `pkill` (dev processes only)
 
-Commands not in the allowlist are blocked by the security hook.
+Commands not in the allowlist are blocked by the security system.
 
-## Project Structure
+## Command Line Options
 
-```
-autonomous-coding/
-├── autonomous_agent_demo.py  # Main entry point
-├── agent.py                  # Agent session logic
-├── client.py                 # Claude SDK client configuration
-├── security.py               # Bash command allowlist and validation
-├── progress.py               # Progress tracking utilities
-├── prompts.py                # Prompt loading utilities
-├── prompts/
-│   ├── app_spec.txt          # Application specification
-│   ├── initializer_prompt.md # First session prompt
-│   └── coding_prompt.md      # Continuation session prompt
-└── requirements.txt          # Python dependencies
-```
-
-## Generated Project Structure
-
-After running, your project directory will contain:
-
-```
-my_project/
-├── feature_list.json         # Test cases (source of truth)
-├── app_spec.txt              # Copied specification
-├── init.sh                   # Environment setup script
-├── claude-progress.txt       # Session progress notes
-├── .claude_settings.json     # Security settings
-└── [application files]       # Generated application code
-```
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--project-dir` | Directory for the project | `./autonomous_demo_project` |
+| `--max-iterations` | Max agent iterations | Unlimited |
+| `--model` | OpenCode model to use | `anthropic/claude-3-5-sonnet-20241022` |
 
 ## Running the Generated Application
 
 After the agent completes (or pauses), you can run the generated application:
 
 ```bash
-cd generations/my_project
+cd my_project
 
 # Run the setup script created by the agent
 ./init.sh
@@ -125,39 +109,47 @@ npm run dev
 
 The application will typically be available at `http://localhost:3000` or similar (check the agent's output or `init.sh` for the exact URL).
 
-## Command Line Options
+## Migration from Claude Code SDK
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--project-dir` | Directory for the project | `./autonomous_demo_project` |
-| `--max-iterations` | Max agent iterations | Unlimited |
-| `--model` | Claude model to use | `claude-sonnet-4-5-20250929` |
+This repository was successfully migrated from Claude Code SDK to OpenCode Python SDK. Key changes:
 
-## Customization
+- **SDK:** `claude-code-sdk` → `opencode-ai`
+- **Session Management:** Direct queries → OpenCode sessions
+- **Security:** Bash hooks → OpenCode permissions
+- **API:** Different response format and error handling
 
-### Changing the Application
+All original functionality is preserved while gaining OpenCode's multi-provider support and modern architecture.
 
-Edit `prompts/app_spec.txt` to specify a different application to build.
+## Development
 
-### Adjusting Feature Count
+### Setup Development Environment
 
-Edit `prompts/initializer_prompt.md` and change the "200 features" requirement to a smaller number for faster demos.
+```bash
+# Install development dependencies
+pip install -r src/requirements.txt
 
-### Modifying Allowed Commands
+# Run tests
+python -m pytest src/tests/
 
-Edit `security.py` to add or remove commands from `ALLOWED_COMMANDS`.
+# Lint code
+python -m flake8 src/
 
-## Troubleshooting
+# Format code
+python -m black src/
+```
 
-**"Appears to hang on first run"**
-This is normal. The initializer agent is generating 200 detailed test cases, which takes significant time. Watch for `[Tool: ...]` output to confirm the agent is working.
+### Architecture
 
-**"Command blocked by security hook"**
-The agent tried to run a command not in the allowlist. This is the security system working as intended. If needed, add the command to `ALLOWED_COMMANDS` in `security.py`.
-
-**"API key not set"**
-Ensure `ANTHROPIC_API_KEY` is exported in your shell environment.
+- **agent.py:** Core agent interaction with OpenCode sessions
+- **client.py:** OpenCode client configuration and security
+- **security.py:** Bash command validation and permissions
+- **progress.py:** Progress tracking and user feedback
+- **prompts.py:** Prompt template management
 
 ## License
 
-Internal Anthropic use.
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+Contributions welcome! Please read the migration documentation in `migration-docs/` for context on the project's evolution.

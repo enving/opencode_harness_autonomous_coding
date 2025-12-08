@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Autonomous Coding Agent Demo - OpenCode Version
-==========================================
+Autonomous Coding Agent Demo
+============================
 
-A minimal harness demonstrating long-running autonomous coding with OpenCode.
+A minimal harness demonstrating long-running autonomous coding with Claude.
 This script implements the two-agent pattern (initializer + coding agent) and
 incorporates all the strategies from the long-running agents guide.
 
 Example Usage:
-    python autonomous_agent_demo_opencode.py --project-dir ./my_project
-    python autonomous_agent_demo_opencode.py --project-dir ./my_project --max-iterations 5
+    python autonomous_agent_demo.py --project-dir ./claude_clone_demo
+    python autonomous_agent_demo.py --project-dir ./claude_clone_demo --max-iterations 5
 """
 
 import argparse
@@ -17,31 +17,31 @@ import asyncio
 import os
 from pathlib import Path
 
-from agent_opencode import run_autonomous_agent
+from agent import run_autonomous_agent
 
 
 # Configuration
-DEFAULT_MODEL = "anthropic/claude-3-5-sonnet-20241022"
+DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Autonomous Coding Agent Demo - OpenCode Version",
+        description="Autonomous Coding Agent Demo - Long-running agent harness",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Start fresh project
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project
+  python autonomous_agent_demo.py --project-dir ./claude_clone
 
   # Use a specific model
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project --model anthropic/claude-3-5-sonnet-20241022
+  python autonomous_agent_demo.py --project-dir ./claude_clone --model claude-sonnet-4-5-20250929
 
   # Limit iterations for testing
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project --max-iterations 5
+  python autonomous_agent_demo.py --project-dir ./claude_clone --max-iterations 5
 
   # Continue existing project
-  python autonomous_agent_demo_opencode.py --project-dir ./my_project
+  python autonomous_agent_demo.py --project-dir ./claude_clone
 
 Environment Variables:
   ANTHROPIC_API_KEY    Your Anthropic API key (required)
@@ -52,7 +52,7 @@ Environment Variables:
         "--project-dir",
         type=Path,
         default=Path("./autonomous_demo_project"),
-        help="Directory for the project (default: ./autonomous_demo_project). Relative paths automatically placed in project directory.",
+        help="Directory for the project (default: generations/autonomous_demo_project). Relative paths automatically placed in generations/ directory.",
     )
 
     parser.add_argument(
@@ -66,7 +66,7 @@ Environment Variables:
         "--model",
         type=str,
         default=DEFAULT_MODEL,
-        help=f"Model to use (default: {DEFAULT_MODEL})",
+        help=f"Claude model to use (default: {DEFAULT_MODEL})",
     )
 
     return parser.parse_args()
@@ -84,8 +84,16 @@ def main() -> None:
         print("  export ANTHROPIC_API_KEY='your-api-key-here'")
         return
 
-    # Use project directory as specified
+    # Automatically place projects in generations/ directory unless already specified
     project_dir = args.project_dir
+    if not str(project_dir).startswith("generations/"):
+        # Convert relative paths to be under generations/
+        if project_dir.is_absolute():
+            # If absolute path, use as-is
+            pass
+        else:
+            # Prepend generations/ to relative paths
+            project_dir = Path("generations") / project_dir
 
     # Run the agent
     try:

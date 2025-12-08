@@ -1,59 +1,37 @@
 """
-Claude SDK Client Configuration
-===============================
+OpenCode Client Configuration
+===========================
 
-Functions for creating and configuring the Claude Agent SDK client.
+Functions for creating and configuring the OpenCode Python SDK client.
 """
 
 import json
 import os
 from pathlib import Path
+from typing import Optional
 
-from claude_code_sdk import ClaudeCodeOptions, ClaudeSDKClient
-from claude_code_sdk.types import HookMatcher
+from opencode_ai import AsyncOpencode
 
-from security import bash_security_hook
-
-
-# Puppeteer MCP tools for browser automation
-PUPPETEER_TOOLS = [
-    "mcp__puppeteer__puppeteer_navigate",
-    "mcp__puppeteer__puppeteer_screenshot",
-    "mcp__puppeteer__puppeteer_click",
-    "mcp__puppeteer__puppeteer_fill",
-    "mcp__puppeteer__puppeteer_select",
-    "mcp__puppeteer__puppeteer_hover",
-    "mcp__puppeteer__puppeteer_evaluate",
-]
-
-# Built-in tools
-BUILTIN_TOOLS = [
-    "Read",
-    "Write",
-    "Edit",
-    "Glob",
-    "Grep",
-    "Bash",
-]
+from security import get_opencode_permissions
 
 
-def create_client(project_dir: Path, model: str) -> ClaudeSDKClient:
+def create_client(project_dir: Path, model: str = "anthropic/claude-3-5-sonnet-20241022") -> AsyncOpencode:
     """
-    Create a Claude Agent SDK client with multi-layered security.
+    Create an OpenCode client with security configuration.
 
     Args:
         project_dir: Directory for the project
-        model: Claude model to use
+        model: Model to use (default: Claude Sonnet 3.5)
 
     Returns:
-        Configured ClaudeSDKClient
+        Configured AsyncOpencode client
 
     Security layers (defense in depth):
-    1. Sandbox - OS-level bash command isolation prevents filesystem escape
-    2. Permissions - File operations restricted to project_dir only
-    3. Security hooks - Bash commands validated against an allowlist
+    1. Permissions - File operations restricted to project_dir only
+    2. Security rules - Bash commands validated against an allowlist
        (see security.py for ALLOWED_COMMANDS)
     """
+    # Check for API key
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         raise ValueError(
@@ -61,62 +39,88 @@ def create_client(project_dir: Path, model: str) -> ClaudeSDKClient:
             "Get your API key from: https://console.anthropic.com/"
         )
 
-    # Create comprehensive security settings
-    # Note: Using relative paths ("./**") restricts access to project directory
-    # since cwd is set to project_dir
-    security_settings = {
-        "sandbox": {"enabled": True, "autoAllowBashIfSandboxed": True},
-        "permissions": {
-            "defaultMode": "acceptEdits",  # Auto-approve edits within allowed directories
-            "allow": [
-                # Allow all file operations within the project directory
-                "Read(./**)",
-                "Write(./**)",
-                "Edit(./**)",
-                "Glob(./**)",
-                "Grep(./**)",
-                # Bash permission granted here, but actual commands are validated
-                # by the bash_security_hook (see security.py for allowed commands)
-                "Bash(*)",
-                # Allow Puppeteer MCP tools for browser automation
-                *PUPPETEER_TOOLS,
-            ],
-        },
-    }
+    # Create OpenCode client
+    client = AsyncOpencode(
+        # Base URL can be configured via OPENCODE_BASE_URL env var
+        # Default: http://localhost:4096
+    )
 
-    # Ensure project directory exists before creating settings file
+    # Ensure project directory exists
     project_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write settings to a file in the project directory
-    settings_file = project_dir / ".claude_settings.json"
-    with open(settings_file, "w") as f:
-        json.dump(security_settings, f, indent=2)
+    # Create OpenCode configuration file
+    config_file = project_dir / ".opencode_settings.json"
+    opencode_config = {
+        "model": model,
+        "permissions": get_opencode_permissions(project_dir),
+        "security": {
+            "bash_allowlist": [
+                "ls", "cat", "head", "tail", "wc", "grep",
+                "npm", "node", "git", "ps", "lsof", "sleep", "pkill"
+            ]
+        }
+    }
 
-    print(f"Created security settings at {settings_file}")
-    print("   - Sandbox enabled (OS-level bash isolation)")
+    with open(config_file, "w") as f:
+        json.dump(opencode_config, f, indent=2)
+
+    print(f"Created OpenCode settings at {config_file}")
     print(f"   - Filesystem restricted to: {project_dir.resolve()}")
     print("   - Bash commands restricted to allowlist (see security.py)")
-    print("   - MCP servers: puppeteer (browser automation)")
+    print(f"   - Model: {model}")
     print()
 
-    return ClaudeSDKClient(
-        options=ClaudeCodeOptions(
-            model=model,
-            system_prompt="You are an expert full-stack developer building a production-quality web application.",
-            allowed_tools=[
-                *BUILTIN_TOOLS,
-                *PUPPETEER_TOOLS,
-            ],
-            mcp_servers={
-                "puppeteer": {"command": "npx", "args": ["puppeteer-mcp-server"]}
+    return client
+
+
+async def create_session(client: AsyncOpencode, title: str, project_dir: Path) -> str:
+    """
+    Create a new OpenCode session for the agent.
+    
+    Args:
+        client: OpenCode client
+        title: Session title
+        project_dir: Project directory path
+        
+    Returns:
+        Session ID
+    """
+    session = await client.session.create({
+        "title": title,
+        "cwd": str(project_dir.resolve())
+    })
+    
+    print(f"Created OpenCode session: {session.id}")
+    return session.id
+
+
+async def send_prompt(
+    client: AsyncOpencode, 
+    session_id: str, 
+    message: str,
+    model: str = "anthropic/claude-3-5-sonnet-20241022"
+) -> dict:
+    """
+    Send a prompt to an OpenCode session.
+    
+    Args:
+        client: OpenCode client
+        session_id: Session ID
+        message: Prompt message
+        model: Model to use
+        
+    Returns:
+        Response data
+    """
+    result = await client.session.prompt({
+        "path": {"id": session_id},
+        "body": {
+            "model": {
+                "providerID": model.split("/")[0],
+                "modelID": model.split("/")[1]
             },
-            hooks={
-                "PreToolUse": [
-                    HookMatcher(matcher="Bash", hooks=[bash_security_hook]),
-                ],
-            },
-            max_turns=1000,
-            cwd=str(project_dir.resolve()),
-            settings=str(settings_file.resolve()),  # Use absolute path
-        )
-    )
+            "parts": [{"type": "text", "text": message}]
+        }
+    })
+    
+    return result
