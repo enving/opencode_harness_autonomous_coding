@@ -8,26 +8,26 @@ Dieses Dokument verfolgt den Fortschritt der Migration von Claude Code SDK (Pyth
 
 ### 1.1 Git Repository initialisieren
 - [x] `git init` ausgeführt
-- [ ] `.gitignore` für TypeScript/Node.js Projekt erstellen
-- [ ] Initial commit mit bestehenden Python-Dateien
+- [x] `.gitignore` für TypeScript/Node.js Projekt erstellt
+- [x] Initial commit mit bestehenden Python-Dateien erstellt
 
 ### 1.2 Package.json erstellen
-- [ ] `package.json` mit allen Dependencies erstellen
-- [ ] Scripts definieren (start, build, dev, test)
-- [ ] Node.js Version festlegen (engines)
-- [ ] Projekt-Metadaten hinzufügen
+- [x] `package.json` mit allen Dependencies erstellt
+- [x] Scripts definiert (start, build, dev, test)
+- [x] Node.js Version festgelegt (engines)
+- [x] Projekt-Metadaten hinzugefügt
 
 ### 1.3 TypeScript Setup
-- [ ] `tsconfig.json` konfigurieren
-- [ ] Build pipeline einrichten (tsx oder ts-node)
+- [x] `tsconfig.json` konfiguriert
+- [x] Build pipeline eingerichtet (tsx)
 - [ ] ESLint und Prettier konfigurieren
-- [ ] Type definitions installieren
+- [x] Type definitions in Dependencies enthalten
 
 ### 1.4 Projektstruktur anlegen
-- [ ] `src/` Verzeichnis erstellen
-- [ ] `tests/` Verzeichnis erstellen
-- [ ] `dist/` Verzeichnis für build output
-- [ ] Ordnerstruktur gemäß Plan anlegen
+- [x] `src/` Verzeichnis erstellt
+- [x] `tests/` Verzeichnis erstellt
+- [x] `dist/` Verzeichnis in .gitignore aufgenommen
+- [x] Ordnerstruktur gemäß Plan angelegt
 
 ### 1.5 OpenCode SDK installieren
 - [ ] `@opencode-ai/sdk` installieren
@@ -232,6 +232,6 @@ Dieses Dokument verfolgt den Fortschritt der Migration von Claude Code SDK (Pyth
 
 ---
 
-**Status**: Phase 1 beginnt  
-**Letzte Aktualisierung**: $(date)  
-**Nächster Check**: Nach Abschluss von 1.2
+**Status**: Phase 1 läuft (4/5 abgeschlossen)  
+**Letzte Aktualisierung**: 2025-12-08  
+**Nächster Check**: Nach Abschluss von 1.5 (OpenCode SDK Installation)
