@@ -36,8 +36,8 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
     
     if not anthropic_key and not openrouter_key:
-        print("🔑 No API key found!")
-        print("💡 Options:")
+        print("ðŸ”‘ No API key found!")
+        print("ðŸ’¡ Options:")
         print("   1. Set ANTHROPIC_API_KEY for Claude models")
         print("   2. Set OPENROUTER_API_KEY for OpenRouter models")
         print()
@@ -47,29 +47,29 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     if model == "auto":
         if openrouter_key:
             model_strategy = "openrouter/anthropic/claude-3.5-sonnet"  # Default OpenRouter model
-            print(f"🚀 Using OpenRouter Claude 3.5 Sonnet")
+            print(f"ðŸš€ Using OpenRouter Claude 3.5 Sonnet")
         elif anthropic_key:
             model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
-            print(f"🤖 Using Claude Sonnet 3.5 (paid tier)")
+            print(f"ðŸ¤– Using Claude Sonnet 3.5 (paid tier)")
         else:
             model_strategy = "auto"  # Fallback to auto-selection
-            print(f"🎯 Using auto-selected model")
+            print(f"ðŸŽ¯ Using auto-selected model")
     else:
         # Use specified model
         model_strategy = model
-        print(f"🎯 Using specified model: {model}")
+        print(f"ðŸŽ¯ Using specified model: {model}")
     
-    print(f"📋 Model strategy: {model_strategy}")
+    print(f"ðŸ“‹ Model strategy: {model_strategy}")
     
     # Create OpenCode client
     try:
         # Check for custom base URL
         base_url = os.environ.get("OPENCODE_BASE_URL", "http://localhost:4096")
         client = AsyncOpencode(base_url=base_url)
-        print(f"✅ OpenCode client created with URL: {base_url}")
-        print("💡 Make sure OpenCode server is running on this address")
+        print(f"âœ… OpenCode client created with URL: {base_url}")
+        print("ðŸ’¡ Make sure OpenCode server is running on this address")
     except Exception as e:
-        print(f"❌ Failed to create OpenCode client: {e}")
+        print(f"âŒ Failed to create OpenCode client: {e}")
         return None
     
     # Ensure project directory exists
@@ -91,7 +91,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     with open(config_file, "w") as f:
         json.dump(opencode_config, f, indent=2)
 
-    print(f"✅ Created OpenCode settings at {config_file}")
+    print(f"âœ… Created OpenCode settings at {config_file}")
     print(f"   - Filesystem restricted to: {project_dir.resolve()}")
     print("   - Bash commands restricted to allowlist (see security.py)")
     print(f"   - Model strategy: {model_strategy}")
@@ -120,10 +120,10 @@ async def create_session(client: AsyncOpencode, title: str, project_dir: Path) -
             }
         )
         
-        print(f"✅ Created OpenCode session: {session.id}")
+        print(f"âœ… Created OpenCode session: {session.id}")
         return session.id
     except Exception as e:
-        print(f"❌ Failed to create session: {e}")
+        print(f"âŒ Failed to create session: {e}")
         raise
 
 
@@ -149,28 +149,35 @@ async def send_prompt(
         # Handle model selection
         if model == "auto":
             # Let OpenCode choose the optimal model
-            model_config = {}  # OpenCode will auto-select
+            result = await client.session.chat(
+                session_id,
+                model_id="anthropic/claude-3.5-sonnet",
+                provider_id="openrouter",
+                parts=[{"type": "text", "text": message}]
+            )
         else:
             # Use specified model (format: provider/model)
             if "/" in model:
                 provider, model_id = model.split("/", 1)
-                model_config = {
-                    "providerID": provider,
-                    "modelID": model_id
-                }
+                result = await client.session.chat(
+                    session_id,
+                    model_id=model_id,
+                    provider_id=provider,
+                    parts=[{"type": "text", "text": message}]
+                )
             else:
-                # If no provider specified, use as model ID
-                model_config = {
-                    "modelID": model
-                }
-        
-        result = await client.session.chat(
-            session_id,
-            model=model_config,
-            parts=[{"type": "text", "text": message}]
-        )
+                # If no provider specified, use as model ID with default provider
+                result = await client.session.chat(
+                    session_id,
+                    model_id=model,
+                    provider_id="openrouter",
+                    parts=[{"type": "text", "text": message}]
+                )
         
         return result
     except Exception as e:
         print(f"❌ Failed to send prompt: {e}")
         raise
+
+
+
