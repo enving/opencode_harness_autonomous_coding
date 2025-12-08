@@ -63,8 +63,11 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     
     # Create OpenCode client
     try:
-        client = AsyncOpencode()
-        print(f"✅ OpenCode client created successfully")
+        # Check for custom base URL
+        base_url = os.environ.get("OPENCODE_BASE_URL", "http://localhost:4096")
+        client = AsyncOpencode(base_url=base_url)
+        print(f"✅ OpenCode client created with URL: {base_url}")
+        print("💡 Make sure OpenCode server is running on this address")
     except Exception as e:
         print(f"❌ Failed to create OpenCode client: {e}")
         return None
@@ -110,10 +113,12 @@ async def create_session(client: AsyncOpencode, title: str, project_dir: Path) -
         Session ID
     """
     try:
-        session = await client.session.create({
-            "title": title,
-            "cwd": str(project_dir.resolve())
-        })
+        session = await client.session.create(
+            extra_body={
+                "title": title,
+                "cwd": str(project_dir.resolve())
+            }
+        )
         
         print(f"✅ Created OpenCode session: {session.id}")
         return session.id
@@ -159,13 +164,11 @@ async def send_prompt(
                     "modelID": model
                 }
         
-        result = await client.session.prompt({
-            "path": {"id": session_id},
-            "body": {
-                "model": model_config,
-                "parts": [{"type": "text", "text": message}]
-            }
-        })
+        result = await client.session.chat(
+            session_id,
+            model=model_config,
+            parts=[{"type": "text", "text": message}]
+        )
         
         return result
     except Exception as e:
