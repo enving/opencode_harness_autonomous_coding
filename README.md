@@ -6,17 +6,33 @@ A minimal harness demonstrating long-running autonomous coding with OpenCode Pyt
 
 **Successfully migrated from Claude Code SDK to official OpenCode Python SDK while maintaining 100% functionality and staying in Python!**
 
+### 🧠 Smart Model Selection (NEW!)
+
+**Multi-API-Key Support with Intelligent Model Selection:**
+
+- **Free Tier**: Set `OPENCODE_API_KEY` for OpenCode's recommended free models
+- **Paid Tier**: Set `ANTHROPIC_API_KEY` for Claude models  
+- **Auto Mode**: Default `--model auto` selects optimal free model automatically
+- **Manual Override**: Specify any model for full control
+
 ## Quick Start
 
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Set your API key
-export ANTHROPIC_API_KEY='your-api-key-here'
+# Set your API key (multiple options)
+export ANTHROPIC_API_KEY='your-api-key-here'     # For Claude models (paid)
+export OPENCODE_API_KEY='your-opencode-key-here'    # For OpenCode free models
 
 # Run the agent
 python autonomous_agent_demo.py --project-dir ./my_project
+
+# Smart model selection (default)
+python autonomous_agent_demo.py --project-dir ./my_project --model auto
+
+# Use specific model
+python autonomous_agent_demo.py --project-dir ./my_project --model anthropic/claude-3-5-sonnet-20241022
 ```
 
 For testing with limited iterations:
