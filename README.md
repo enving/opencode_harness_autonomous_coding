@@ -17,16 +17,37 @@ A minimal harness demonstrating long-running autonomous coding with OpenCode Pyt
 
 ## Quick Start
 
+### Prerequisites
+
+1. **OpenCode Server**: Start OpenCode server first
+   ```bash
+   # Using Docker (recommended)
+   docker run -d -p 4096:4096 --name opencode-server --entrypoint="" ghcr.io/sst/opencode opencode serve --port 4096 --hostname 0.0.0.0
+   
+   # Or install locally
+   npm install -g opencode-ai
+   opencode serve --port 4096 --hostname 0.0.0.0
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set your API key** (multiple options):
+   ```powershell
+   # For Claude models (paid)
+   $env:ANTHROPIC_API_KEY='your-api-key-here'
+   
+   # For OpenRouter models (recommended)
+   $env:OPENROUTER_API_KEY='your-openrouter-key-here'
+   ```
+
+### Running the Agent
+
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set your API key (multiple options)
-export ANTHROPIC_API_KEY='your-api-key-here'     # For Claude models (paid)
-export OPENCODE_API_KEY='your-opencode-key-here'    # For OpenCode free models
-
-# Run the agent
-python autonomous_agent_demo.py --project-dir ./my_project
+# Run with OpenRouter (recommended)
+python autonomous_agent_demo.py --project-dir ./my_project --model openrouter/anthropic/claude-3.5-sonnet
 
 # Smart model selection (default)
 python autonomous_agent_demo.py --project-dir ./my_project --model auto
