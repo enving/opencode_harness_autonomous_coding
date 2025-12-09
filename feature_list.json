@@ -1,0 +1,1541 @@
+[
+  {
+    "category": "functional",
+    "description": "Send a basic text message and receive a response from Claude",
+    "steps": [
+      "Navigate to the main chat interface",
+      "Type 'Hello, how are you?' in the input field",
+      "Click the send button or press Enter",
+      "Verify that the message appears in the chat area",
+      "Verify that a typing indicator appears",
+      "Verify that Claude's response streams in gradually",
+      "Verify that the response completes and typing indicator disappears"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test message streaming functionality with a longer prompt",
+    "steps": [
+      "Navigate to a new conversation",
+      "Type a detailed prompt asking for a code example",
+      "Send the message",
+      "Observe the streaming response word by word",
+      "Verify no interruption in streaming",
+      "Verify response completes successfully",
+      "Check that the full response is coherent"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Stop message generation during streaming",
+    "steps": [
+      "Send a message that will generate a long response",
+      "Wait for streaming to start",
+      "Click the stop generation button",
+      "Verify that streaming stops immediately",
+      "Verify that partial response is displayed",
+      "Verify that input field becomes available again"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Edit a previously sent message",
+    "steps": [
+      "Send an initial message",
+      "Wait for response",
+      "Click the edit button on the user message",
+      "Modify the message text",
+      "Click save or press Enter",
+      "Verify the message updates in the chat",
+      "Verify Claude responds to the edited message"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Regenerate a response from Claude",
+    "steps": [
+      "Send a message and receive a response",
+      "Click the regenerate button on the assistant message",
+      "Verify that a new response is generated",
+      "Verify that the old response is replaced",
+      "Verify that the new response is different from the original"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Upload and display an image in a message",
+    "steps": [
+      "Click the attachment button in the input area",
+      "Select an image file from the file picker",
+      "Verify the image preview appears in the input area",
+      "Send the message with the image",
+      "Verify the image displays in the chat message",
+      "Verify Claude can analyze the image in its response"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test multi-turn conversation with context preservation",
+    "steps": [
+      "Send an initial message establishing context",
+      "Send a follow-up message referencing the previous context",
+      "Verify Claude remembers and responds appropriately to the context",
+      "Send multiple follow-up messages",
+      "Verify conversation history is maintained throughout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test keyboard shortcuts for sending messages",
+    "steps": [
+      "Focus on the input field",
+      "Type a message",
+      "Press Enter to send",
+      "Verify message sends successfully",
+      "Type another message",
+      "Press Shift+Enter to add a new line",
+      "Verify new line is added instead of sending",
+      "Press Enter to send the multi-line message"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test character count and token estimation",
+    "steps": [
+      "Type a short message in the input field",
+      "Verify character count displays correctly",
+      "Verify token estimation appears",
+      "Type a longer message",
+      "Verify counts update in real-time",
+      "Verify warning appears when approaching limits"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test auto-resize textarea functionality",
+    "steps": [
+      "Focus on the input field",
+      "Type a single line message",
+      "Verify textarea height adjusts appropriately",
+      "Add multiple lines using Shift+Enter",
+      "Verify textarea expands to accommodate content",
+      "Send message and verify textarea resets to single line"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify chat interface layout matches Claude.ai design",
+    "steps": [
+      "Navigate to the main chat interface",
+      "Verify three-column layout: sidebar, main chat, artifacts panel",
+      "Verify sidebar is collapsible",
+      "Verify main chat area is centered",
+      "Verify artifacts panel slides in from right",
+      "Verify overall layout matches reference design"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify message bubble styling and alignment",
+    "steps": [
+      "Send a user message",
+      "Verify user message appears right-aligned",
+      "Verify user message has subtle background",
+      "Send an assistant message",
+      "Verify assistant message appears left-aligned",
+      "Verify assistant message has no background",
+      "Verify proper spacing between messages"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify typing indicator animation",
+    "steps": [
+      "Send a message",
+      "Observe the typing indicator appearance",
+      "Verify animated dots or similar indicator",
+      "Verify indicator disappears when response completes",
+      "Verify smooth animation without jank"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify input area styling and responsiveness",
+    "steps": [
+      "Focus on the input area",
+      "Verify rounded borders and proper padding",
+      "Verify placeholder text styling",
+      "Type content and verify auto-resize",
+      "Verify send button styling and hover states",
+      "Verify attachment button appearance"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify markdown rendering in messages",
+    "steps": [
+      "Send a message with various markdown elements",
+      "Verify headers render correctly",
+      "Verify bold and italic text styling",
+      "Verify lists are properly formatted",
+      "Verify links are styled as links",
+      "Verify overall typography matches design"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test code block rendering with syntax highlighting",
+    "steps": [
+      "Send a message containing code blocks in different languages",
+      "Verify code blocks are detected and rendered",
+      "Verify syntax highlighting is applied",
+      "Verify language is detected or specified",
+      "Verify copy button appears on code blocks",
+      "Click copy button and verify code is copied to clipboard"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test LaTeX/math equation rendering",
+    "steps": [
+      "Send a message with LaTeX math expressions",
+      "Verify equations are rendered as formatted math",
+      "Verify inline math vs block math display",
+      "Verify complex equations render correctly",
+      "Verify math rendering doesn't break other formatting"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test artifact detection and panel opening",
+    "steps": [
+      "Send a message that should generate code artifacts",
+      "Verify artifacts are automatically detected",
+      "Verify artifacts panel slides in from the right",
+      "Verify artifact title and type are displayed",
+      "Verify artifact content is rendered appropriately",
+      "Verify panel can be closed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test code artifact viewer functionality",
+    "steps": [
+      "Generate a code artifact",
+      "Open the artifacts panel",
+      "Verify code is syntax highlighted",
+      "Verify language detection",
+      "Test editing the code in the artifact viewer",
+      "Verify re-prompt functionality works",
+      "Test downloading the artifact"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test HTML/SVG artifact live preview",
+    "steps": [
+      "Generate an HTML artifact",
+      "Open artifacts panel",
+      "Verify live HTML preview renders",
+      "Verify SVG artifacts display correctly",
+      "Test switching between code and preview tabs",
+      "Verify preview updates when code is edited"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test React component artifact preview",
+    "steps": [
+      "Generate a React component artifact",
+      "Open artifacts panel",
+      "Verify React component renders in preview",
+      "Verify component is interactive if applicable",
+      "Test editing component code",
+      "Verify preview updates with changes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test Mermaid diagram rendering",
+    "steps": [
+      "Generate a Mermaid diagram artifact",
+      "Open artifacts panel",
+      "Verify diagram renders visually",
+      "Verify different diagram types work (flowchart, sequence, etc.)",
+      "Test diagram interactivity if supported"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test text document artifacts",
+    "steps": [
+      "Generate a text document artifact",
+      "Open artifacts panel",
+      "Verify text content displays properly",
+      "Verify formatting is preserved",
+      "Test editing text content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test artifact editing and re-prompting",
+    "steps": [
+      "Open an existing artifact",
+      "Click edit button",
+      "Modify the artifact content",
+      "Click re-prompt button",
+      "Verify Claude receives the modified content",
+      "Verify new response incorporates changes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test artifact full-screen mode",
+    "steps": [
+      "Open an artifact",
+      "Click full-screen toggle",
+      "Verify artifact expands to full screen",
+      "Verify editing capabilities in full-screen",
+      "Click toggle again to return to panel view"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test artifact downloading",
+    "steps": [
+      "Open an artifact",
+      "Click download button",
+      "Verify file download starts",
+      "Verify downloaded file contains correct content",
+      "Verify appropriate file extension"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test artifact versioning",
+    "steps": [
+      "Edit an artifact multiple times",
+      "Verify version history is maintained",
+      "Test switching between versions",
+      "Verify current version is marked",
+      "Test reverting to previous version"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify artifacts panel design and animations",
+    "steps": [
+      "Trigger artifact panel to open",
+      "Verify smooth slide-in animation",
+      "Verify panel header styling",
+      "Verify tab navigation for multiple artifacts",
+      "Verify close button positioning",
+      "Verify overall panel matches design system"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify code artifact viewer styling",
+    "steps": [
+      "Open a code artifact",
+      "Verify syntax highlighting colors",
+      "Verify copy button styling",
+      "Verify line numbers if present",
+      "Verify scrollbar styling",
+      "Verify font and spacing"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify artifact preview styling",
+    "steps": [
+      "Open an HTML/SVG artifact",
+      "Verify preview area styling",
+      "Verify iframe or container appearance",
+      "Verify loading states",
+      "Verify error states for invalid content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create a new conversation",
+    "steps": [
+      "Click 'New Chat' button in sidebar",
+      "Verify new conversation is created",
+      "Verify conversation appears in sidebar list",
+      "Verify chat area shows welcome screen",
+      "Verify conversation gets auto-generated title after first message"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Rename a conversation",
+    "steps": [
+      "Select a conversation from sidebar",
+      "Click on the conversation title",
+      "Enter new title",
+      "Press Enter or click away",
+      "Verify title updates in sidebar",
+      "Verify title persists after page refresh"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Delete a conversation with confirmation",
+    "steps": [
+      "Right-click on a conversation in sidebar",
+      "Select 'Delete' from context menu",
+      "Verify confirmation dialog appears",
+      "Click 'Confirm' button",
+      "Verify conversation is removed from sidebar",
+      "Verify conversation is not accessible"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Search conversations by title and content",
+    "steps": [
+      "Click in the search input in sidebar",
+      "Type part of a conversation title",
+      "Verify matching conversations are filtered",
+      "Type content from a conversation message",
+      "Verify conversations containing that content appear",
+      "Clear search and verify all conversations return"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Pin important conversations",
+    "steps": [
+      "Right-click on a conversation",
+      "Select 'Pin' from context menu",
+      "Verify conversation moves to pinned section",
+      "Verify pin icon appears",
+      "Unpin and verify it returns to normal position"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Archive conversations",
+    "steps": [
+      "Right-click on a conversation",
+      "Select 'Archive' from context menu",
+      "Verify conversation moves to archived section",
+      "Verify archived conversations are hidden by default",
+      "Toggle archive view and verify visibility"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Duplicate a conversation",
+    "steps": [
+      "Right-click on a conversation",
+      "Select 'Duplicate' from context menu",
+      "Verify new conversation is created",
+      "Verify it contains the same messages",
+      "Verify it has '(Copy)' appended to title"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Export conversation to JSON",
+    "steps": [
+      "Open a conversation with messages",
+      "Click export button or right-click menu",
+      "Select JSON format",
+      "Verify file download starts",
+      "Open downloaded file and verify it contains conversation data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Export conversation to Markdown",
+    "steps": [
+      "Open a conversation",
+      "Export to Markdown format",
+      "Verify download completes",
+      "Open file and verify proper markdown formatting",
+      "Verify code blocks and formatting are preserved"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Export conversation to PDF",
+    "steps": [
+      "Open a conversation",
+      "Export to PDF format",
+      "Verify PDF download",
+      "Open PDF and verify content matches conversation",
+      "Verify formatting and layout are preserved"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View conversation timestamps",
+    "steps": [
+      "Open a conversation",
+      "Hover over messages",
+      "Verify created timestamps are displayed",
+      "Check conversation list for last updated times",
+      "Verify timestamps are in user-friendly format"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View unread message indicators",
+    "steps": [
+      "Have multiple conversations",
+      "Send messages in different conversations",
+      "Switch between conversations",
+      "Verify unread indicators appear on conversations with new messages",
+      "Verify indicators clear when conversation is viewed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify sidebar conversation list styling",
+    "steps": [
+      "View the sidebar conversation list",
+      "Verify conversations grouped by date",
+      "Verify pinned conversations appear at top",
+      "Verify hover states on conversation items",
+      "Verify selected conversation highlighting",
+      "Verify scrollbar styling if needed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify conversation context menu styling",
+    "steps": [
+      "Right-click on a conversation",
+      "Verify context menu appears",
+      "Verify menu item styling",
+      "Verify hover states",
+      "Verify menu positioning",
+      "Verify menu closes on outside click"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create a new project",
+    "steps": [
+      "Click project selector in header",
+      "Select 'Create New Project'",
+      "Enter project name and description",
+      "Choose a color",
+      "Click 'Create'",
+      "Verify project appears in selector",
+      "Verify project is selected"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Upload documents to project knowledge base",
+    "steps": [
+      "Open project settings",
+      "Navigate to knowledge base section",
+      "Click 'Upload Document'",
+      "Select a file",
+      "Verify upload progress",
+      "Verify document appears in knowledge base list",
+      "Verify Claude can reference the document in responses"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Set project-specific custom instructions",
+    "steps": [
+      "Open project settings",
+      "Navigate to custom instructions",
+      "Enter project-specific instructions",
+      "Save changes",
+      "Start a new conversation in the project",
+      "Verify Claude follows the project instructions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Share a project (mock feature)",
+    "steps": [
+      "Open project settings",
+      "Click 'Share Project'",
+      "Enter team member email",
+      "Click 'Send Invite'",
+      "Verify invitation is sent (mock)",
+      "Verify shared status is indicated"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Move conversations between projects",
+    "steps": [
+      "Right-click on a conversation",
+      "Select 'Move to Project'",
+      "Choose target project from dropdown",
+      "Confirm move",
+      "Verify conversation appears in new project",
+      "Verify conversation removed from old project"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View project analytics",
+    "steps": [
+      "Open project settings",
+      "Navigate to analytics tab",
+      "Verify usage statistics are displayed",
+      "Verify conversation count",
+      "Verify token usage metrics",
+      "Verify time period filters work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify project selector UI",
+    "steps": [
+      "Click project selector dropdown",
+      "Verify dropdown styling",
+      "Verify project list formatting",
+      "Verify color indicators",
+      "Verify create new project option",
+      "Verify smooth animations"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Switch between different Claude models",
+    "steps": [
+      "Click model selector in header",
+      "Select 'Claude Haiku 4.5'",
+      "Verify model changes",
+      "Send a test message",
+      "Verify response comes from selected model",
+      "Switch back to default model",
+      "Verify model reverts"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View model capabilities and pricing",
+    "steps": [
+      "Open model selector dropdown",
+      "Hover over each model option",
+      "Verify capabilities are displayed (context window, etc.)",
+      "Verify pricing information shows",
+      "Verify model descriptions are clear",
+      "Select a model and verify selection persists"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Switch models mid-conversation",
+    "steps": [
+      "Start a conversation with default model",
+      "Send a few messages",
+      "Change model using selector",
+      "Send another message",
+      "Verify response style changes appropriately",
+      "Verify conversation history is preserved"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Compare models side-by-side",
+    "steps": [
+      "Access model comparison view",
+      "Select two models to compare",
+      "Send same prompt to both",
+      "Verify responses are displayed side-by-side",
+      "Verify differences are highlighted",
+      "Verify ability to switch between comparison views"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify model selector styling",
+    "steps": [
+      "Open model selector",
+      "Verify dropdown appearance",
+      "Verify model option formatting",
+      "Verify capability badges",
+      "Verify selected model indication",
+      "Verify smooth transitions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Set global custom instructions",
+    "steps": [
+      "Open settings modal",
+      "Navigate to custom instructions tab",
+      "Enter global instructions",
+      "Save changes",
+      "Start a new conversation",
+      "Verify Claude follows global instructions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create conversation-specific system prompts",
+    "steps": [
+      "Start a new conversation",
+      "Click system prompt selector",
+      "Choose or create a custom prompt",
+      "Send a message",
+      "Verify Claude responds according to the system prompt",
+      "Verify prompt persists for the conversation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Preview how instructions affect responses",
+    "steps": [
+      "In settings, enter custom instructions",
+      "Use preview feature",
+      "Send a test prompt",
+      "Verify preview shows how Claude would respond",
+      "Adjust instructions and preview again",
+      "Verify changes affect the preview"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Create custom instruction templates",
+    "steps": [
+      "Open custom instructions settings",
+      "Click 'Create Template'",
+      "Enter template name and content",
+      "Save template",
+      "Verify template appears in list",
+      "Apply template to a conversation"
+    ],
+    "passes": false
+  },
+  {
+    "style",
+    "description": "Verify custom instructions UI styling",
+    "steps": [
+      "Open custom instructions settings",
+      "Verify textarea styling",
+      "Verify template list formatting",
+      "Verify preview area appearance",
+      "Verify save button styling",
+      "Verify overall layout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Switch between light and dark themes",
+    "steps": [
+      "Open settings modal",
+      "Navigate to appearance tab",
+      "Select 'Dark' theme",
+      "Verify theme changes immediately",
+      "Verify all components adapt to dark mode",
+      "Switch back to light theme",
+      "Verify proper reversion"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Adjust font size",
+    "steps": [
+      "Open settings",
+      "Find font size slider",
+      "Increase font size",
+      "Verify text size changes across interface",
+      "Decrease font size",
+      "Verify changes revert",
+      "Verify setting persists"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Change message density",
+    "steps": [
+      "Open settings",
+      "Select message density option",
+      "Choose 'Compact'",
+      "Verify message spacing reduces",
+      "Choose 'Spacious'",
+      "Verify increased spacing",
+      "Verify setting saves"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Select code theme",
+    "steps": [
+      "Open settings",
+      "Navigate to code theme selector",
+      "Choose a different theme",
+      "View a code block in chat",
+      "Verify syntax highlighting changes",
+      "Verify theme persists"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View keyboard shortcuts reference",
+    "steps": [
+      "Open settings",
+      "Find keyboard shortcuts section",
+      "Click 'View Shortcuts'",
+      "Verify modal or overlay appears",
+      "Verify all shortcuts are listed",
+      "Verify shortcuts are categorized"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Export user data",
+    "steps": [
+      "Open settings",
+      "Navigate to data export",
+      "Click 'Export All Data'",
+      "Verify download starts",
+      "Open exported file",
+      "Verify it contains conversations, settings, etc."
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify settings modal design",
+    "steps": [
+      "Open settings modal",
+      "Verify tabbed interface",
+      "Verify each tab's content layout",
+      "Verify form styling",
+      "Verify save/cancel buttons",
+      "Verify modal animations"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Adjust temperature control",
+    "steps": [
+      "Open advanced settings",
+      "Find temperature slider",
+      "Set to low value (0.1)",
+      "Send creative prompt",
+      "Verify more deterministic response",
+      "Set to high value (1.0)",
+      "Send same prompt",
+      "Verify more creative/varied response"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Control max tokens",
+    "steps": [
+      "Set max tokens to low value (50)",
+      "Send a prompt requesting long response",
+      "Verify response is truncated appropriately",
+      "Increase max tokens",
+      "Regenerate response",
+      "Verify longer response is generated"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Use top-p (nucleus sampling)",
+    "steps": [
+      "Adjust top-p slider",
+      "Set to low value (0.1)",
+      "Send prompt and observe response style",
+      "Set to high value (0.9)",
+      "Send same prompt",
+      "Compare response diversity"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Override system prompt",
+    "steps": [
+      "Open advanced settings",
+      "Enter custom system prompt",
+      "Save changes",
+      "Send a message",
+      "Verify Claude responds according to custom prompt",
+      "Verify override takes precedence"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Toggle thinking/reasoning mode",
+    "steps": [
+      "Enable thinking mode",
+      "Send a complex reasoning prompt",
+      "Verify Claude shows reasoning process",
+      "Disable thinking mode",
+      "Send same prompt",
+      "Verify more direct response"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test multi-modal input with images",
+    "steps": [
+      "Enable multi-modal input",
+      "Upload an image",
+      "Ask question about the image",
+      "Verify Claude analyzes the image",
+      "Verify response incorporates image content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Use voice input (mock UI)",
+    "steps": [
+      "Click voice input button",
+      "Grant microphone permission (mock)",
+      "Speak a message",
+      "Verify speech is transcribed",
+      "Verify transcribed text appears in input",
+      "Send the message"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify advanced controls UI",
+    "steps": [
+      "Open advanced settings panel",
+      "Verify slider styling",
+      "Verify value displays",
+      "Verify toggle switches",
+      "Verify input fields",
+      "Verify overall layout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Share conversation via link",
+    "steps": [
+      "Open a conversation",
+      "Click share button",
+      "Select 'Share via Link'",
+      "Verify shareable link is generated",
+      "Copy the link",
+      "Open link in new browser (incognito)",
+      "Verify conversation is viewable read-only"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Export conversation to multiple formats",
+    "steps": [
+      "Open conversation export menu",
+      "Select JSON export",
+      "Verify download",
+      "Select Markdown export",
+      "Verify download",
+      "Select PDF export",
+      "Verify download",
+      "Verify each format contains correct data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Use conversation templates",
+    "steps": [
+      "Access template library",
+      "Select a conversation template",
+      "Apply to new conversation",
+      "Verify template content loads",
+      "Send message and verify template context is used"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browse prompt library",
+    "steps": [
+      "Open prompt library",
+      "Browse by categories",
+      "Select a prompt",
+      "Apply to input field",
+      "Verify prompt text is inserted",
+      "Send and verify appropriate response"
+    ],
+    "passes": false
+  },
+  {
+    "functional",
+    "description": "Share artifacts",
+    "steps": [
+      "Open an artifact",
+      "Click share button",
+      "Generate shareable link",
+      "Open link in new window",
+      "Verify artifact is viewable",
+      "Verify editing is disabled in shared view"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify sharing UI components",
+    "steps": [
+      "Open share modal",
+      "Verify link input styling",
+      "Verify copy button",
+      "Verify permission settings",
+      "Verify modal layout",
+      "Verify animations"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Search across all conversations",
+    "steps": [
+      "Open search interface",
+      "Enter search term from a conversation",
+      "Verify matching conversations appear",
+      "Click on search result",
+      "Verify conversation opens with highlighted matches",
+      "Verify search works across message content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Filter search by project and date",
+    "steps": [
+      "Open advanced search",
+      "Select specific project filter",
+      "Choose date range",
+      "Enter search term",
+      "Verify results are filtered correctly",
+      "Verify filter combinations work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browse prompt library categories",
+    "steps": [
+      "Open prompt library",
+      "View category tabs",
+      "Click on different categories",
+      "Verify prompts filter by category",
+      "Verify category descriptions",
+      "Apply a categorized prompt"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View example conversations",
+    "steps": [
+      "Access examples section",
+      "Browse example conversations",
+      "Click on an example",
+      "Verify example loads as template",
+      "Verify ability to modify and send"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Use command palette (Cmd/Ctrl+K)",
+    "steps": [
+      "Press Cmd/Ctrl+K",
+      "Verify command palette opens",
+      "Type to search commands",
+      "Select a command",
+      "Verify command executes",
+      "Verify palette closes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify search interface styling",
+    "steps": [
+      "Open search overlay",
+      "Verify input field styling",
+      "Verify result list formatting",
+      "Verify filter controls",
+      "Verify highlighting of matches",
+      "Verify animations"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View token usage per message",
+    "steps": [
+      "Send a message",
+      "Hover over the message",
+      "Verify token count is displayed",
+      "Verify input and output tokens shown separately",
+      "Verify cost estimate if available"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View conversation cost estimation",
+    "steps": [
+      "Open a conversation with multiple messages",
+      "View conversation header",
+      "Verify total cost estimate",
+      "Verify breakdown by model",
+      "Verify real-time updates as conversation progresses"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Check daily usage dashboard",
+    "steps": [
+      "Open usage dashboard",
+      "View daily usage chart",
+      "Verify token counts",
+      "Verify cost totals",
+      "Verify date navigation",
+      "Verify model breakdown"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Monitor API quota and limits",
+    "steps": [
+      "View usage dashboard",
+      "Check current quota status",
+      "Verify warning when approaching limits",
+      "Verify limit enforcement",
+      "Verify quota reset timing"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify usage dashboard UI",
+    "steps": [
+      "Open usage dashboard",
+      "Verify chart styling",
+      "Verify data table formatting",
+      "Verify progress bars for limits",
+      "Verify color coding",
+      "Verify responsive layout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Complete welcome screen flow",
+    "steps": [
+      "Load app as new user",
+      "Verify welcome screen appears",
+      "Click through feature highlights",
+      "Try suggested prompts",
+      "Verify onboarding completes",
+      "Verify welcome screen doesn't show again"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View feature tour highlights",
+    "steps": [
+      "Trigger feature tour",
+      "Verify overlay highlights appear",
+      "Click through each highlight",
+      "Verify tooltips with explanations",
+      "Verify tour can be skipped",
+      "Verify tour completion"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Try example prompts from onboarding",
+    "steps": [
+      "View suggested prompts",
+      "Click on an example prompt",
+      "Verify prompt loads in input",
+      "Send the prompt",
+      "Verify appropriate response",
+      "Verify prompt helps user get started"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "View quick tips and best practices",
+    "steps": [
+      "Access tips section",
+      "Read through tips",
+      "Verify tips are helpful",
+      "Verify ability to dismiss tips",
+      "Verify tips don't reappear if dismissed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Complete keyboard shortcuts tutorial",
+    "steps": [
+      "Start shortcuts tutorial",
+      "Follow tutorial steps",
+      "Practice each shortcut",
+      "Verify tutorial tracks progress",
+      "Complete tutorial",
+      "Verify shortcuts work as learned"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify onboarding UI design",
+    "steps": [
+      "View welcome screen",
+      "Verify layout and styling",
+      "Verify button designs",
+      "Verify illustration quality",
+      "Verify responsive design",
+      "Verify animation smoothness"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test full keyboard navigation",
+    "steps": [
+      "Use Tab to navigate through interface",
+      "Verify focus indicators",
+      "Use arrow keys in lists",
+      "Verify keyboard selection",
+      "Use Enter to activate elements",
+      "Verify Escape to close modals"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Verify screen reader support",
+    "steps": [
+      "Enable screen reader",
+      "Navigate through interface",
+      "Verify ARIA labels are read",
+      "Verify semantic HTML structure",
+      "Verify dynamic content announcements",
+      "Verify form error announcements"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test ARIA labels and roles",
+    "steps": [
+      "Inspect elements with developer tools",
+      "Verify aria-label attributes",
+      "Verify role attributes",
+      "Verify aria-describedby links",
+      "Verify aria-expanded states",
+      "Verify live regions for dynamic content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test high contrast mode",
+    "steps": [
+      "Enable high contrast mode",
+      "Verify color changes",
+      "Verify contrast ratios meet standards",
+      "Verify text remains readable",
+      "Verify interactive elements are distinguishable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Verify focus management",
+    "steps": [
+      "Open a modal",
+      "Verify focus moves to modal",
+      "Tab through modal elements",
+      "Verify focus trap within modal",
+      "Close modal",
+      "Verify focus returns to trigger element"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test reduced motion support",
+    "steps": [
+      "Enable reduced motion in OS",
+      "Verify animations are disabled or reduced",
+      "Verify transitions are instant",
+      "Verify loading indicators still work",
+      "Verify essential animations remain"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify accessibility indicator styling",
+    "steps": [
+      "View focus outlines",
+      "Verify outline styling",
+      "Verify skip links if present",
+      "Verify error state styling",
+      "Verify success state styling",
+      "Verify consistent accessibility patterns"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test mobile responsive layout",
+    "steps": [
+      "Resize browser to mobile width",
+      "Verify sidebar collapses",
+      "Verify single column layout",
+      "Verify touch-friendly button sizes",
+      "Verify readable text sizes",
+      "Verify swipe gestures work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test tablet responsive layout",
+    "steps": [
+      "Resize to tablet width",
+      "Verify two-column layout",
+      "Verify sidebar behavior",
+      "Verify touch interactions",
+      "Verify content scaling",
+      "Verify navigation works"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test desktop three-column layout",
+    "steps": [
+      "View on desktop width",
+      "Verify three-column layout",
+      "Verify sidebar resize handle",
+      "Verify artifacts panel behavior",
+      "Verify all columns are visible",
+      "Verify layout adapts to content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test touch-optimized interface",
+    "steps": [
+      "Use touch device or simulator",
+      "Verify button sizes meet touch targets",
+      "Verify swipe gestures for navigation",
+      "Verify touch scrolling",
+      "Verify no hover-dependent interactions",
+      "Verify touch feedback"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test collapsible sidebar on mobile",
+    "steps": [
+      "On mobile view",
+      "Verify sidebar is hidden by default",
+      "Tap menu button",
+      "Verify sidebar slides in",
+      "Verify overlay appears",
+      "Tap outside to close"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test swipe gestures for navigation",
+    "steps": [
+      "On mobile",
+      "Swipe from left edge",
+      "Verify sidebar opens",
+      "Swipe right on sidebar",
+      "Verify sidebar closes",
+      "Swipe between conversations",
+      "Verify conversation switching"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test adaptive artifact display",
+    "steps": [
+      "On mobile",
+      "Generate an artifact",
+      "Verify artifact opens full-screen",
+      "Verify mobile-optimized controls",
+      "On desktop",
+      "Verify panel view",
+      "Verify responsive artifact content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test PWA installation",
+    "steps": [
+      "Verify PWA manifest",
+      "Verify service worker registration",
+      "Trigger install prompt",
+      "Install as PWA",
+      "Verify app works offline (basic functionality)",
+      "Verify app icon and name"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify responsive design consistency",
+    "steps": [
+      "Test across different screen sizes",
+      "Verify layout breakpoints",
+      "Verify typography scaling",
+      "Verify spacing consistency",
+      "Verify component adaptation",
+      "Verify no horizontal scrolling"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify color palette implementation",
+    "steps": [
+      "View in light mode",
+      "Verify primary orange accent",
+      "Verify background and surface colors",
+      "Switch to dark mode",
+      "Verify dark theme colors",
+      "Verify text contrast ratios"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify typography consistency",
+    "steps": [
+      "Check heading styles",
+      "Verify body text styling",
+      "Verify code font usage",
+      "Verify font size hierarchy",
+      "Verify line heights",
+      "Verify font weight usage"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify component styling patterns",
+    "steps": [
+      "Check button styles",
+      "Verify input field styling",
+      "Verify card components",
+      "Verify modal styling",
+      "Verify form elements",
+      "Verify consistent spacing"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Verify animation and transition smoothness",
+    "steps": [
+      "Trigger various animations",
+      "Verify smooth transitions",
+      "Check loading animations",
+      "Verify hover states",
+      "Verify modal open/close",
+      "Verify no janky animations"
+    ],
+    "passes": false
+  }
+]
