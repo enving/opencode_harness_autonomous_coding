@@ -31,18 +31,23 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     2. Security rules - Bash commands validated against an allowlist
        (see security.py for ALLOWED_COMMANDS)
     """
-    # Check for API key (support multiple providers)
+# Check for API key (support multiple providers)
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
     
+    opencode_key = os.environ.get("OPENCODE_API_KEY")
+    
+    # Debug output
+    print(f"Debug: ANTHROPIC_API_KEY = {'SET' if anthropic_key else 'NOT SET'}")
+    print(f"Debug: OPENROUTER_API_KEY = {'SET' if openrouter_key else 'NOT SET'}")
+    print(f"Debug: OPENCODE_API_KEY = {'SET' if opencode_key else 'NOT SET'}")
+    
+    # TEMPORARY FIX: For testing, continue even without keys
     if not anthropic_key and not openrouter_key and not opencode_key:
-        print("🔑 No API key found!")
-        print("💡 Options:")
-        print("   1. Set ANTHROPIC_API_KEY for Claude models")
-        print("   2. Set OPENROUTER_API_KEY for OpenRouter models")
-        print("   3. Set OPENCODE_API_KEY for OpenCode Zen models")
-        print()
-        return None
+        print("Warning: No API keys found in environment. Continuing anyway...")
+        print("Note: You should set ANTHROPIC_API_KEY or OPENROUTER_API_KEY for production use")
+        # Don't return None - let the client handle authentication
+        # return None
     
     # Determine model strategy
     if model == "auto":
@@ -66,7 +71,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     try:
         # Check for custom base URL
         base_url = os.environ.get("OPENCODE_BASE_URL", "http://localhost:4096")
-        client = AsyncOpencode(base_url=base_url)
+        client = AsyncOpencode(base_url=base_url, timeout=1200.0)
         print(f"âœ… OpenCode client created with URL: {base_url}")
         print("ðŸ’¡ Make sure OpenCode server is running on this address")
     except Exception as e:
@@ -77,10 +82,19 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     project_dir.mkdir(parents=True, exist_ok=True)
 
     # Create OpenCode configuration file
-    config_file = project_dir / ".opencode_settings.json"
+    config_file = project_dir / ".opencode.json"
     opencode_config = {
+        "$schema": "https://opencode.ai/config.json",
+        "theme": "opencode",
         "model": model_strategy,
-        "permissions": get_opencode_permissions(project_dir),
+        "autoupdate": True,
+        "permission": {
+            "edit": "allow",
+            "bash": "ask",
+            "webfetch": "deny",
+            "doom_loop": "ask",
+            "external_directory": "ask"
+        },
         "security": {
             "bash_allowlist": [
                 "ls", "cat", "head", "tail", "wc", "grep",
@@ -114,17 +128,26 @@ async def create_session(client: AsyncOpencode, title: str, project_dir: Path) -
         Session ID
     """
     try:
-        session = await client.session.create(
-            extra_body={
-                "title": title,
-                "cwd": str(project_dir.resolve())
-            }
-        )
-        
-        print(f"âœ… Created OpenCode session: {session.id}")
-        return session.id
+        # Try to create a new session first
+        try:
+            session = await client.session.create(extra_body={"title": title})
+            print(f"Created new OpenCode session: {session.id}")
+            return session.id
+        except Exception as create_error:
+            print(f"Failed to create new session: {create_error}")
+            print("Falling back to existing session...")
+            
+            # Fall back to using existing session
+            sessions = await client.session.list()
+            if sessions:
+                session = sessions[0]
+                print(f"Using existing session: {session.id}")
+                return session.id
+            else:
+                raise Exception("No existing sessions available and cannot create new one")
+                
     except Exception as e:
-        print(f"âŒ Failed to create session: {e}")
+        print(f"Failed to create or get session: {e}")
         raise
 
 
@@ -147,19 +170,32 @@ async def send_prompt(
         Response data
     """
     try:
+        print(f"DEBUG: Sending prompt with model={model}, message length={len(message)}")
         # Handle model selection
         if model == "auto":
-            # Let OpenCode choose the optimal model
+            # Let OpenCode choose the optimal model - default to Claude on Anthropic
             result = await client.session.chat(
                 session_id,
-                model_id="anthropic/claude-3.5-sonnet",
-                provider_id="openrouter",
+                model_id="claude-3-5-sonnet-20241022",
+                provider_id="anthropic",
                 parts=[{"type": "text", "text": message}]
             )
         else:
-            # Use specified model (format: provider/model)
+            # Use specified model (format: provider/model or provider/vendor/model)
             if "/" in model:
-                provider, model_id = model.split("/", 1)
+                parts_list = model.split("/")
+                if len(parts_list) == 2:
+                    # Format: provider/model (e.g., anthropic/claude-sonnet-4-5-20250929)
+                    provider, model_id = parts_list
+                elif len(parts_list) == 3:
+                    # Format: provider/vendor/model (e.g., openrouter/anthropic/claude-3.5-sonnet)
+                    provider, vendor, model_name = parts_list
+                    model_id = f"{vendor}/{model_name}"
+                else:
+                    # Fallback: use as-is
+                    provider = "openrouter"
+                    model_id = model
+                
                 result = await client.session.chat(
                     session_id,
                     model_id=model_id,
@@ -172,12 +208,15 @@ async def send_prompt(
                     session_id,
                     model_id=model,
                     provider_id="openrouter",
-                    parts=[{"type": "text", "text": message}]
+                    parts=[{"type": "text", "text": message}],
+                    extra_body={"max_tokens": 2000}
                 )
         
         return result
     except Exception as e:
-        print(f"❌ Failed to send prompt: {e}")
+        print(f"❌ Failed to send prompt: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         raise
 
 

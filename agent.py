@@ -25,6 +25,7 @@ async def run_agent_session(
     session_id: str,
     message: str,
     project_dir: Path,
+    model: str = "auto",
 ) -> Tuple[str, str]:
     """
     Run a single agent session using OpenCode SDK.
@@ -44,8 +45,17 @@ async def run_agent_session(
 
     try:
         # Send the prompt
-        result = await send_prompt(client, session_id, message)
-        
+        result = await send_prompt(client, session_id, message, model=model)
+        print(f"DEBUG: send_prompt result: {result}")
+
+        # Check for API errors
+        if hasattr(result, 'error') and result.error:
+            print(f"API Error: {result.error}")
+            return "error", str(result.error)
+        if hasattr(result, 'info') and result.info and 'error' in result.info:
+            print(f"API Error in info: {result.info['error']}")
+            return "error", str(result.info['error'])
+
         # Extract response text from result
         response_text = ""
         if hasattr(result, 'content'):
@@ -144,7 +154,7 @@ async def run_autonomous_agent(
         print_session_header(iteration, is_first_run)
 
         # Run session
-        status, response = await run_agent_session(client, session_id, prompt, project_dir)
+        status, response = await run_agent_session(client, session_id, prompt, project_dir, model)
 
         # Handle status
         if status == "continue":
