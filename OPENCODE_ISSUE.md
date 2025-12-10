@@ -23,17 +23,22 @@ When configured with:
 }
 ```
 
-And calling the SDK:
+And calling the SDK with **required parameters** as defined in the official API:
 
 ```python
+# Official SDK signature from opencode-ai v0.1.0a36:
+# async chat(id, *, model_id: str, provider_id: str, parts, extra_body, ...)
+
 result = await client.session.chat(
     session_id,
-    model_id="mistralai/mistral-7b-instruct:free",
-    provider_id="openrouter",
+    model_id="mistralai/mistral-7b-instruct:free",  # REQUIRED parameter
+    provider_id="openrouter",                        # REQUIRED parameter
     parts=[{"type": "text", "text": message}],
     extra_body={"max_tokens": 200}
 )
 ```
+
+**Note:** According to the SDK's Python signature, `model_id` and `provider_id` are **required parameters**, not optional. We used the API correctly.
 
 **Expected:** Server uses `mistralai/mistral-7b-instruct:free` (free tier, $0.00 cost)
 
@@ -158,10 +163,25 @@ All failed to prevent server-side model switching:
 ## Environment
 
 - **OpenCode Server:** Docker `ghcr.io/sst/opencode` (latest)
-- **OpenCode Python SDK:** `opencode-ai` 0.x.x
+- **OpenCode Python SDK:** `opencode-ai` v0.1.0a36
 - **Provider:** OpenRouter
 - **Models Configured:** Free tier (`mistralai/mistral-7b-instruct:free`, `meta-llama/llama-3.1-8b-instruct:free`)
 - **Models Actually Used:** Paid tier (Gemini 3 Pro, Claude Haiku)
+
+### SDK Method Signature (verified):
+
+```python
+async def chat(
+    self, id: str, *,
+    model_id: str,              # REQUIRED - but ignored by server
+    provider_id: str,           # REQUIRED - but ignored by server  
+    parts: Iterable[...],
+    extra_body: Body | None,    # Used for max_tokens - but ignored by server
+    ...
+) -> AssistantMessage
+```
+
+The parameters `model_id` and `provider_id` are **required** by the SDK API, yet the server overrides them.
 
 ## Additional Context
 
