@@ -198,12 +198,17 @@ async def send_prompt(
                     provider = "openrouter"
                     model_id = model
                 
+                # Force free tier by setting very low max_tokens
+                extra_body = {"max_tokens": 500}
+                if "free" in model_id.lower():
+                    extra_body["max_tokens"] = 200  # Even lower for explicitly free models
+
                 result = await client.session.chat(
                     session_id,
                     model_id=model_id,
                     provider_id=provider,
                     parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 1000}
+                    extra_body=extra_body
                 )
             else:
                 # If no provider specified, use as model ID with default provider
