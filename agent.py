@@ -110,6 +110,19 @@ async def run_autonomous_agent(
     # Check if this is a fresh start or continuation
     tests_file = project_dir / "feature_list.json"
     is_first_run = not tests_file.exists()
+    
+    print(f"🔍 DEBUG: is_first_run={is_first_run}")
+    print(f"🔍 DEBUG: feature_list.json exists={tests_file.exists()}")
+    print(f"🔍 DEBUG: feature_list.json path={tests_file.resolve()}")
+    if tests_file.exists():
+        try:
+            import json
+            features = json.loads(tests_file.read_text())
+            print(f"🔍 DEBUG: feature_list.json has {len(features)} features")
+            passed = sum(1 for f in features if f.get("passes", False))
+            print(f"🔍 DEBUG: {passed} features passed, {len(features) - passed} remaining")
+        except Exception as e:
+            print(f"⚠️  WARNING: Could not read feature_list.json: {e}")
 
     if is_first_run:
         print("Fresh start - will use initializer agent")
@@ -131,15 +144,17 @@ async def run_autonomous_agent(
 
     # Create or get session
     if is_first_run:
+        print("📋 Using INITIALIZER prompt for first session")
         session_id = await create_session(client, "Initializer Agent - Project Setup", project_dir)
         prompt = get_initializer_prompt()
-        is_first_run = False  # Only use initializer once
     else:
+        print("💻 Using CODING prompt for continuation")
         session_id = await create_session(client, "Coding Agent - Feature Implementation", project_dir)
         prompt = get_coding_prompt()
 
     # Main loop
     iteration = 0
+    used_initializer = is_first_run  # Track if we started with initializer
 
     while True:
         iteration += 1
@@ -151,10 +166,24 @@ async def run_autonomous_agent(
             break
 
         # Print session header
-        print_session_header(iteration, is_first_run)
+        print_session_header(iteration, used_initializer and iteration == 1)
 
         # Run session
         status, response = await run_agent_session(client, session_id, prompt, project_dir, model)
+        
+        # After first iteration with initializer, switch to coding prompt
+        if iteration == 1 and used_initializer:
+            print("\n🔄 Switching from INITIALIZER to CODING prompt for next iteration")
+            prompt = get_coding_prompt()
+            
+            # Check if feature_list.json was created
+            if tests_file.exists():
+                try:
+                    import json
+                    features = json.loads(tests_file.read_text())
+                    print(f"✅ feature_list.json created with {len(features)} features")
+                except Exception as e:
+                    print(f"⚠️  WARNING: Could not validate feature_list.json: {e}")
 
         # Handle status
         if status == "continue":

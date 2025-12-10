@@ -90,7 +90,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
         "$schema": "https://opencode.ai/config.json",
         "theme": "opencode",
         "model": model_strategy,
-        "max_tokens": 1000,
+        "max_tokens": 200,  # Reduced to minimize costs
         "autoupdate": True,
         "permission": {
             "edit": "allow",
@@ -175,33 +175,45 @@ async def send_prompt(
     """
     try:
         print(f"DEBUG: Sending prompt with model={model}, message length={len(message)}")
+        
+        # Get API keys
+        openrouter_key = os.environ.get("OPENROUTER_API_KEY")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+        opencode_key = os.environ.get("OPENCODE_API_KEY")
+        
         # Handle model selection
         if model == "auto":
-            # Let OpenCode choose the optimal model - default to free models
+            # ALWAYS prefer FREE models!
             if openrouter_key:
+                # Use FREE Mistral model
+                print("🆓 Using FREE OpenRouter Mistral model")
                 result = await client.session.chat(
                     session_id,
-                    model_id="meta-llama/llama-3.1-8b-instruct:free",
+                    model_id="mistralai/mistral-7b-instruct:free",
                     provider_id="openrouter",
                     parts=[{"type": "text", "text": message}],
                     extra_body={"max_tokens": 200}
                 )
             elif anthropic_key:
+                # WARNING: This is PAID tier!
+                print("⚠️  WARNING: Using PAID Claude model - costs apply!")
+                print("💡 TIP: Set OPENROUTER_API_KEY to use free models instead")
                 result = await client.session.chat(
                     session_id,
                     model_id="claude-3-5-sonnet-20241022",
                     provider_id="anthropic",
                     parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 1000}
+                    extra_body={"max_tokens": 200}  # Reduced from 1000
                 )
             else:
                 # Fallback to OpenCode free model
+                print("🆓 Using OpenCode free model")
                 result = await client.session.chat(
                     session_id,
                     model_id="gpt-4o-mini",
                     provider_id="opencode",
                     parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 500}
+                    extra_body={"max_tokens": 200}  # Reduced from 500
                 )
         else:
             # Use specified model (format: provider/model or provider/vendor/model)
@@ -220,9 +232,9 @@ async def send_prompt(
                     model_id = model
                 
                 # Force free tier by setting very low max_tokens
-                extra_body = {"max_tokens": 500}
+                extra_body = {"max_tokens": 200}  # Reduced from 500
                 if "free" in model_id.lower():
-                    extra_body["max_tokens"] = 200  # Even lower for explicitly free models
+                    extra_body["max_tokens"] = 200  # Keep at 200 for free models
 
                 result = await client.session.chat(
                     session_id,
@@ -233,12 +245,13 @@ async def send_prompt(
                 )
             else:
                 # If no provider specified, use as model ID with default provider
+                print("⚠️  Using default provider with custom model")
                 result = await client.session.chat(
                     session_id,
                     model_id=model,
                     provider_id="openrouter",
                     parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 2000}
+                    extra_body={"max_tokens": 200}  # Reduced from 2000
                 )
         
         return result
