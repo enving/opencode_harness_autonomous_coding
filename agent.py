@@ -111,18 +111,18 @@ async def run_autonomous_agent(
     tests_file = project_dir / "feature_list.json"
     is_first_run = not tests_file.exists()
     
-    print(f"🔍 DEBUG: is_first_run={is_first_run}")
-    print(f"🔍 DEBUG: feature_list.json exists={tests_file.exists()}")
-    print(f"🔍 DEBUG: feature_list.json path={tests_file.resolve()}")
+    print(f"DEBUG: is_first_run={is_first_run}")
+    print(f"DEBUG: feature_list.json exists={tests_file.exists()}")
+    print(f"DEBUG: feature_list.json path={tests_file.resolve()}")
     if tests_file.exists():
         try:
             import json
             features = json.loads(tests_file.read_text())
-            print(f"🔍 DEBUG: feature_list.json has {len(features)} features")
+            print(f"DEBUG: feature_list.json has {len(features)} features")
             passed = sum(1 for f in features if f.get("passes", False))
-            print(f"🔍 DEBUG: {passed} features passed, {len(features) - passed} remaining")
+            print(f"DEBUG: {passed} features passed, {len(features) - passed} remaining")
         except Exception as e:
-            print(f"⚠️  WARNING: Could not read feature_list.json: {e}")
+            print(f"WARNING: Could not read feature_list.json: {e}")
 
     if is_first_run:
         print("Fresh start - will use initializer agent")
