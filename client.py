@@ -52,11 +52,14 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     # Determine model strategy
     if model == "auto":
         if openrouter_key:
-            model_strategy = "openrouter/anthropic/claude-3.5-sonnet"  # Default OpenRouter model
-            print(f"ðŸš€ Using OpenRouter Claude 3.5 Sonnet")
+            model_strategy = "openrouter/meta-llama/llama-3.1-8b-instruct:free"  # Free OpenRouter model
+            print(f"ðŸš€ Using free OpenRouter Llama 3.1")
         elif anthropic_key:
             model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
             print(f"ðŸ¤– Using Claude Sonnet 3.5 (paid tier)")
+        elif opencode_key:
+            model_strategy = "opencode/gpt-4o-mini"  # OpenCode free model
+            print(f"ðŸŽ¯ Using OpenCode GPT-4o Mini (free)")
         else:
             model_strategy = "auto"  # Fallback to auto-selection
             print(f"ðŸŽ¯ Using auto-selected model")
@@ -174,14 +177,32 @@ async def send_prompt(
         print(f"DEBUG: Sending prompt with model={model}, message length={len(message)}")
         # Handle model selection
         if model == "auto":
-            # Let OpenCode choose the optimal model - default to Claude on Anthropic
-            result = await client.session.chat(
-                session_id,
-                model_id="claude-3-5-sonnet-20241022",
-                provider_id="anthropic",
-                parts=[{"type": "text", "text": message}],
-                extra_body={"max_tokens": 1000}
-            )
+            # Let OpenCode choose the optimal model - default to free models
+            if openrouter_key:
+                result = await client.session.chat(
+                    session_id,
+                    model_id="meta-llama/llama-3.1-8b-instruct:free",
+                    provider_id="openrouter",
+                    parts=[{"type": "text", "text": message}],
+                    extra_body={"max_tokens": 200}
+                )
+            elif anthropic_key:
+                result = await client.session.chat(
+                    session_id,
+                    model_id="claude-3-5-sonnet-20241022",
+                    provider_id="anthropic",
+                    parts=[{"type": "text", "text": message}],
+                    extra_body={"max_tokens": 1000}
+                )
+            else:
+                # Fallback to OpenCode free model
+                result = await client.session.chat(
+                    session_id,
+                    model_id="gpt-4o-mini",
+                    provider_id="opencode",
+                    parts=[{"type": "text", "text": message}],
+                    extra_body={"max_tokens": 500}
+                )
         else:
             # Use specified model (format: provider/model or provider/vendor/model)
             if "/" in model:
