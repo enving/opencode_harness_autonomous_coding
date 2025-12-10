@@ -80,9 +80,7 @@ Requirements:
 
 ```bash
 # With free model (Google Gemini)
-python autonomous_agent_demo.py \
-  --project-dir ./my-app \
-  --model openrouter/google/gemini-flash-1.5-8b:free
+python autonomous_agent_demo.py --project-dir ./my-app --model openrouter/google/gemini-flash-1.5-8b:free
 
 # With paid model (Claude)
 python autonomous_agent_demo.py \
@@ -90,9 +88,10 @@ python autonomous_agent_demo.py \
   --model anthropic/claude-sonnet-4-5-20250929
 
 # With OpenRouter + Claude
-python autonomous_agent_demo.py \
-  --project-dir ./my-app \
-  --model openrouter/anthropic/claude-3.5-sonnet
+python autonomous_agent_demo.py --project-dir ./my-app --model openrouter/anthropic/claude-3.5-sonnet
+
+# With OpenRouter + Mistral 7B (free)
+python autonomous_agent_demo.py --project-dir ./my-app --model openrouter/mistralai/mistral-7b-instruct:free
 ```
 
 ## How It Works
