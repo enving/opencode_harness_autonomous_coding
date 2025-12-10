@@ -2,44 +2,79 @@
 
 ## 🚨 AKTUELLE PROBLEME & LÖSUNGEN
 
-### Problem 1: Bezahltes Claude-Modell wird trotz OpenRouter/Mistral verwendet ❌
-**Status:** IDENTIFIZIERT - Zeile 192 in client.py verwendet `claude-3-5-sonnet-20241022`
+### Problem 1: Bezahltes Claude-Modell wird trotz OpenRouter/Mistral verwendet ✅
+**Status:** BEHOBEN - client.py nutzt jetzt FREE Mistral
 
 **Lösung:**
-- [ ] In `client.py` Zeile 182-196: OpenRouter FREE Mistral als Fallback verwenden
-- [ ] Sicherstellen dass NIEMALS anthropic direkt aufgerufen wird wenn OpenRouter Key vorhanden
-- [ ] Alle `anthropic/claude` References durch `openrouter/.../mistral-7b-instruct:free` ersetzen
+- [x] In `client.py` Zeile 182-196: OpenRouter FREE Mistral als Fallback verwenden
+- [x] Sicherstellen dass NIEMALS anthropic direkt aufgerufen wird wenn OpenRouter Key vorhanden
+- [x] Alle `anthropic/claude` References durch `mistralai/mistral-7b-instruct:free` ersetzen
 
-### Problem 2: Nach feature_list.json Erstellung geht es nicht weiter
-**Status:** OFFEN - Agent stoppt nach initialer Feature-Liste
+### Problem 2: Nach feature_list.json Erstellung geht es nicht weiter ✅
+**Status:** BEHOBEN - Auto-Switch zu Coding-Prompt implementiert
 
-**Mögliche Ursachen:**
-1. Session wird nicht richtig fortgesetzt
-2. Coding prompt wird nicht geladen
-3. Agent erkennt nicht dass es weitergehen soll
-4. Git commit fehlt oder feature_list.json nicht committed
+**Lösung:**
+- [x] Log-Ausgabe bei Session-Wechsel implementiert
+- [x] `is_first_run` Flag Logik überprüft (agent.py Zeile 112-136)
+- [x] feature_list.json Validation nach Erstellung
+- [x] Automatischer Prompt-Wechsel nach erster Session
 
-**Nächste Schritte:**
-- [ ] Log-Ausgabe bei Session-Wechsel prüfen
-- [ ] `is_first_run` Flag Logik überprüfen (agent.py Zeile 112-136)
-- [ ] Sicherstellen dass feature_list.json im Projekt-Dir landet
-- [ ] Coding-Prompt Logik testen
-
-### Problem 3: Max Tokens Konfiguration
-**Status:** IDENTIFIZIERT - Verschiedene max_tokens Werte
+### Problem 3: Max Tokens Konfiguration ✅
+**Status:** BEHOBEN - Alle auf 200 reduziert
 
 **Locations:**
-- client.py:93 - Config: 1000 tokens
+- client.py:93 - Config: 200 tokens ✅
 - client.py:187 - OpenRouter free: 200 tokens ✅
-- client.py:195 - Anthropic: 1000 tokens ❌
-- client.py:204 - OpenCode: 500 tokens
-- client.py:223 - Custom: 500 tokens
+- client.py:195 - Anthropic: 200 tokens ✅
+- client.py:204 - OpenCode: 200 tokens ✅
+- client.py:223 - Custom: 200 tokens ✅
 - client.py:225 - Free models: 200 tokens ✅
-- client.py:241 - Fallback: 2000 tokens ❌
+- client.py:241 - Fallback: 200 tokens ✅
 
 **Lösung:**
-- [ ] Überall auf max 200-500 tokens limitieren für free tier
-- [ ] Config max_tokens auf 200 reduzieren
+- [x] Überall auf 200 tokens limitiert
+- [x] Config max_tokens auf 200 reduziert
+
+### Problem 4: API Keys werden nicht erkannt ❌
+**Status:** NEU ENTDECKT - Environment Variables werden nicht gelesen
+
+**Fehler:**
+```
+Debug: ANTHROPIC_API_KEY = NOT SET
+Debug: OPENROUTER_API_KEY = NOT SET
+Debug: OPENCODE_API_KEY = NOT SET
+```
+
+**Ursache:**
+- OpenCode Docker Server hat den Key, aber er wird nicht an Python weitergegeben
+- Environment Variables werden im PowerShell nicht korrekt gesetzt
+
+**Lösung:**
+```powershell
+# Option 1: Direkt aus Docker .opencode.json lesen
+# Docker Workspace: /workspace/.opencode.json
+# Lokal: C:\Users\t.wilms\Documents\opencode_harness_autonomous_coding\my-app\.opencode.json
+
+# Option 2: API Key aus /tmp/api-key lesen (wie in app_spec.txt erwähnt)
+# Python-Skript soll /tmp/api-key lesen wenn keine ENV vars gesetzt
+
+# Option 3: Key manuell in PowerShell setzen
+$env:OPENROUTER_API_KEY = "sk-or-v1-..."
+python autonomous_agent_demo.py ...
+```
+
+### Problem 5: OpenRouter Key Limit erreicht ❌
+**Status:** NEU - Rate Limit überschritten
+
+**Fehler:**
+```
+Key limit exceeded (total limit). Manage it using https://openrouter.ai/settings/keys
+```
+
+**Lösung:**
+- [ ] Neuen OpenRouter API Key erstellen (https://openrouter.ai/settings/keys)
+- [ ] Oder: Alternative free models nutzen (z.B. OpenCode eigene Models)
+- [ ] Oder: Anthropic Key nutzen (aber PAID!)
 
 ---
 

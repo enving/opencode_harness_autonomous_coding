@@ -15,6 +15,38 @@ from opencode_ai import AsyncOpencode
 from security import get_opencode_permissions
 
 
+def read_api_key_from_file() -> Optional[str]:
+    """
+    Try to read API key from /tmp/api-key file (Docker setup).
+    
+    Returns:
+        API key string or None
+    """
+    api_key_paths = [
+        Path("/tmp/api-key"),
+        Path("C:/tmp/api-key"),
+        Path("./.opencode.json"),
+    ]
+    
+    for path in api_key_paths:
+        if path.exists():
+            try:
+                content = path.read_text().strip()
+                # If it's a JSON file, extract the key
+                if path.suffix == ".json":
+                    config = json.loads(content)
+                    if "apiKey" in config:
+                        print(f"✅ Found API key in {path}")
+                        return config["apiKey"]
+                else:
+                    print(f"✅ Found API key in {path}")
+                    return content
+            except Exception as e:
+                print(f"⚠️  Could not read API key from {path}: {e}")
+    
+    return None
+
+
 def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpencode]:
     """
     Create an OpenCode client with security configuration.
@@ -31,54 +63,64 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     2. Security rules - Bash commands validated against an allowlist
        (see security.py for ALLOWED_COMMANDS)
     """
-# Check for API key (support multiple providers)
+    # Check for API key (support multiple providers)
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
-    
     opencode_key = os.environ.get("OPENCODE_API_KEY")
+    
+    # Try to read from file if not in environment
+    if not anthropic_key and not openrouter_key and not opencode_key:
+        file_key = read_api_key_from_file()
+        if file_key:
+            # Assume it's an OpenRouter key if read from file
+            openrouter_key = file_key
+            os.environ["OPENROUTER_API_KEY"] = file_key
     
     # Debug output
     print(f"Debug: ANTHROPIC_API_KEY = {'SET' if anthropic_key else 'NOT SET'}")
     print(f"Debug: OPENROUTER_API_KEY = {'SET' if openrouter_key else 'NOT SET'}")
     print(f"Debug: OPENCODE_API_KEY = {'SET' if opencode_key else 'NOT SET'}")
     
-    # TEMPORARY FIX: For testing, continue even without keys
+    # If still no key, show error
     if not anthropic_key and not openrouter_key and not opencode_key:
-        print("Warning: No API keys found in environment. Continuing anyway...")
-        print("Note: You should set ANTHROPIC_API_KEY or OPENROUTER_API_KEY for production use")
-        # Don't return None - let the client handle authentication
-        # return None
+        print("❌ ERROR: No API keys found!")
+        print("\nOptions:")
+        print("  1. Set environment variable:")
+        print("     $env:OPENROUTER_API_KEY='sk-or-v1-...'")
+        print("\n  2. Create /tmp/api-key file with your key")
+        print("\n  3. Put key in .opencode.json as 'apiKey'")
+        return None
     
     # Determine model strategy
     if model == "auto":
         if openrouter_key:
             model_strategy = "openrouter/meta-llama/llama-3.1-8b-instruct:free"  # Free OpenRouter model
-            print(f"ðŸš€ Using free OpenRouter Llama 3.1")
+            print(f"🚀 Using free OpenRouter Llama 3.1")
         elif anthropic_key:
             model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
-            print(f"ðŸ¤– Using Claude Sonnet 3.5 (paid tier)")
+            print(f"🤖 Using Claude Sonnet 3.5 (paid tier)")
         elif opencode_key:
             model_strategy = "opencode/gpt-4o-mini"  # OpenCode free model
-            print(f"ðŸŽ¯ Using OpenCode GPT-4o Mini (free)")
+            print(f"🎯 Using OpenCode GPT-4o Mini (free)")
         else:
             model_strategy = "auto"  # Fallback to auto-selection
-            print(f"ðŸŽ¯ Using auto-selected model")
+            print(f"🎯 Using auto-selected model")
     else:
         # Use specified model
         model_strategy = model
-        print(f"ðŸŽ¯ Using specified model: {model}")
+        print(f"🎯 Using specified model: {model}")
     
-    print(f"ðŸ“‹ Model strategy: {model_strategy}")
+    print(f"📋 Model strategy: {model_strategy}")
     
     # Create OpenCode client
     try:
         # Check for custom base URL
         base_url = os.environ.get("OPENCODE_BASE_URL", "http://localhost:4096")
         client = AsyncOpencode(base_url=base_url, timeout=1200.0)
-        print(f"âœ… OpenCode client created with URL: {base_url}")
-        print("ðŸ’¡ Make sure OpenCode server is running on this address")
+        print(f"✅ OpenCode client created with URL: {base_url}")
+        print("💡 Make sure OpenCode server is running on this address")
     except Exception as e:
-        print(f"âŒ Failed to create OpenCode client: {e}")
+        print(f"❌ Failed to create OpenCode client: {e}")
         return None
     
     # Ensure project directory exists
@@ -110,7 +152,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     with open(config_file, "w") as f:
         json.dump(opencode_config, f, indent=2)
 
-    print(f"âœ… Created OpenCode settings at {config_file}")
+    print(f"✅ Created OpenCode settings at {config_file}")
     print(f"   - Filesystem restricted to: {project_dir.resolve()}")
     print("   - Bash commands restricted to allowlist (see security.py)")
     print(f"   - Model strategy: {model_strategy}")
