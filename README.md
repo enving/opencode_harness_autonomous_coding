@@ -1,107 +1,253 @@
-# Claude.ai Clone
+# OpenCode Harness - Autonomous Coding Agent
 
-A fully functional clone of Anthropic's Claude.ai conversational AI interface, built with modern web technologies.
+An autonomous coding agent that uses OpenCode (Claude-powered IDE) to automatically build applications from specifications. The agent iteratively implements features, runs tests, and refines code until the application is complete.
 
 ## Features
 
-- **Streaming Chat**: Real-time message streaming with Claude API
-- **Artifact System**: Code rendering, HTML previews, and interactive artifacts
-- **Conversation Management**: Organize, search, and manage conversations
-- **Projects**: Group related conversations with custom instructions
-- **Model Selection**: Choose between Claude Sonnet, Haiku, and Opus models
-- **Advanced Settings**: Temperature, token limits, and custom instructions
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Dark Mode**: Full dark theme support
-- **Collaboration**: Share conversations and artifacts
+- **Autonomous Development**: AI agent implements features independently
+- **Test-Driven Development**: Works from a detailed feature list with test specifications
+- **Multi-Model Support**: Works with Anthropic Claude, OpenRouter, and free models
+- **Flexible Architecture**: Supports both provider/model and provider/vendor/model formats
+- **Docker Integration**: OpenCode server runs in Docker with volume mounts
+- **Progress Tracking**: Monitors feature completion across sessions
+- **Security**: Bash command allowlist and filesystem restrictions
 
-## Tech Stack
+## Architecture
 
-- **Frontend**: React 18 + Vite + Tailwind CSS
-- **Backend**: Node.js + Express + SQLite
-- **AI**: Anthropic Claude API
-- **Streaming**: Server-Sent Events (SSE)
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Python Client  │────▶│  OpenCode Server │────▶│  LLM Provider   │
+│  (agent.py)     │     │  (Docker)        │     │  (OpenRouter)   │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+         │                       │
+         │                       ▼
+         │              ┌──────────────────┐
+         └─────────────▶│  Project Dir     │
+                        │  (Volume Mount)  │
+                        └──────────────────┘
+```
 
 ## Quick Start
 
-1. **Clone and setup**:
-   ```bash
-   git clone <repository-url>
-   cd claude-clone
-   ```
+### 1. Prerequisites
 
-2. **Environment setup**:
-   ```bash
-   # Copy environment file
-   cp .env.example .env
+- Docker Desktop (for OpenCode server)
+- Python 3.11+
+- OpenRouter API Key (or Anthropic API Key)
 
-   # Add your Anthropic API key
-   echo "VITE_ANTHROPIC_API_KEY=your_key_here" >> .env
-   ```
+### 2. Install Dependencies
 
-3. **Run the application**:
-   ```bash
-   ./init.sh
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-4. **Open your browser**:
-   - Frontend: http://localhost:3000
-   - API Docs: http://localhost:5000/api/docs
+### 3. Start OpenCode Server
 
-## Development
+```bash
+# With OpenRouter (recommended for free models)
+docker run -d -p 4096:4096 \
+  -e OPENROUTER_API_KEY='your-key-here' \
+  -v "$(pwd)/your-project:/workspace" \
+  --workdir /workspace \
+  --name opencode-server \
+  ghcr.io/sst/opencode serve --port 4096 --hostname 0.0.0.0
 
-### Prerequisites
+# Or with Anthropic (paid, higher quality)
+docker run -d -p 4096:4096 \
+  -e ANTHROPIC_API_KEY='your-key-here' \
+  -v "$(pwd)/your-project:/workspace" \
+  --workdir /workspace \
+  --name opencode-server \
+  ghcr.io/sst/opencode serve --port 4096 --hostname 0.0.0.0
+```
 
-- Node.js 18+
-- npm or pnpm
+### 4. Create Your App Specification
 
-### Project Structure
+Create `prompts/app_spec.txt` with your application requirements:
 
 ```
-├── server/                 # Backend (Express + SQLite)
-│   ├── src/
-│   ├── database.db        # SQLite database
-│   └── package.json
-├── src/                   # Frontend (React + Vite)
-├── public/                # Static assets
-├── feature_list.json      # Test specifications (200+ tests)
-├── init.sh               # Development setup script
+Build a CLI Todo Application
+
+Requirements:
+- Add tasks with descriptions
+- List all tasks with status
+- Mark tasks as completed
+- Store tasks in JSON file
+- Python implementation
+```
+
+### 5. Run the Agent
+
+```bash
+# With free model (Google Gemini)
+python autonomous_agent_demo.py \
+  --project-dir ./my-app \
+  --model openrouter/google/gemini-flash-1.5-8b:free
+
+# With paid model (Claude)
+python autonomous_agent_demo.py \
+  --project-dir ./my-app \
+  --model anthropic/claude-sonnet-4-5-20250929
+
+# With OpenRouter + Claude
+python autonomous_agent_demo.py \
+  --project-dir ./my-app \
+  --model openrouter/anthropic/claude-3.5-sonnet
+```
+
+## How It Works
+
+1. **Initialization Phase**: Agent reads `app_spec.txt` and creates:
+   - `feature_list.json` - Test cases for all features
+   - `init.sh` - Setup script
+   - Basic project structure
+
+2. **Implementation Phase**: Agent iteratively:
+   - Picks next unimplemented feature
+   - Writes code and tests
+   - Runs tests
+   - Marks feature as passing when tests succeed
+
+3. **Completion**: Continues until all features pass
+
+## Configuration
+
+### Model Selection
+
+The agent supports flexible model formats:
+
+```bash
+# Format: provider/model
+--model anthropic/claude-sonnet-4-5-20250929
+
+# Format: provider/vendor/model  
+--model openrouter/anthropic/claude-3.5-sonnet
+
+# Free models
+--model openrouter/google/gemini-flash-1.5-8b:free
+--model openrouter/mistralai/mistral-7b-instruct:free
+```
+
+### Max Tokens
+
+Configured automatically based on model:
+- Free models: 1000 tokens
+- Paid models: 4096 tokens
+
+### Security
+
+Edit `security.py` to customize:
+- Bash command allowlist
+- Filesystem restrictions
+- Permission settings
+
+## Project Structure
+
+```
+opencode_harness_autonomous_coding/
+├── agent.py                    # Core agent logic
+├── client.py                   # OpenCode client wrapper
+├── autonomous_agent_demo.py    # Main entry point
+├── prompts.py                  # Prompt management
+├── security.py                 # Security configuration
+├── prompts/
+│   ├── app_spec.txt           # Your app specification
+│   ├── initializer_prompt.md  # First-run prompt
+│   └── coding_prompt.md       # Feature implementation prompt
+├── tests/                      # Test suite
 └── README.md
 ```
 
-### Available Scripts
+## API Keys
 
-- `npm run dev` - Start development servers
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run test` - Run tests
-- `npm run lint` - Lint code
+### OpenRouter (Recommended)
 
-## API Reference
+1. Sign up at https://openrouter.ai
+2. Add credits: https://openrouter.ai/settings/credits
+3. Create API key: https://openrouter.ai/settings/keys
+4. Use in Docker: `-e OPENROUTER_API_KEY='sk-or-v1-...'`
 
-### Authentication
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
+**Note**: Free models require ~$5 minimum credits due to server-side `max_tokens` settings.
 
-### Conversations
-- `GET /api/conversations`
-- `POST /api/conversations`
-- `GET /api/conversations/:id`
+### Anthropic
 
-### Messages
-- `POST /api/conversations/:id/messages`
-- `GET /api/messages/stream` (SSE)
+1. Sign up at https://console.anthropic.com
+2. Create API key: https://console.anthropic.com/settings/keys
+3. Use in Docker: `-e ANTHROPIC_API_KEY='sk-ant-api03-...'`
 
-### Artifacts
-- `GET /api/conversations/:id/artifacts`
-- `GET /api/artifacts/:id`
+## Troubleshooting
+
+### "No API keys found"
+- This warning is safe to ignore if your server has the key
+- Keys are set in Docker container, not Python client
+
+### "Connection error"
+- Ensure OpenCode server is running: `docker ps`
+- Check logs: `docker logs opencode-server`
+
+### "Request requires more credits"
+- Add credits to your OpenRouter account
+- Or use a paid Anthropic API key
+
+### Files created in wrong location
+- Ensure Docker volume mount is correct: `-v "$(pwd)/project:/workspace"`
+- Check `--workdir /workspace` is set
+
+## Advanced Usage
+
+### Custom Iteration Limit
+
+```bash
+python autonomous_agent_demo.py \
+  --project-dir ./my-app \
+  --model openrouter/google/gemini-flash-1.5-8b:free \
+  --max-iterations 10
+```
+
+### Resume Existing Project
+
+The agent automatically detects existing `feature_list.json` and continues from where it left off.
+
+### Adjust Feature Count
+
+Edit `prompts/initializer_prompt.md` to change the number of features generated (default: 3 for testing, increase for production).
+
+## Development
+
+### Running Tests
+
+```bash
+# All tests
+pytest
+
+# Specific test
+pytest tests/test_agent.py::test_agent_session
+
+# With coverage
+pytest --cov=. --cov-report=html
+```
+
+### Code Style
+
+- Follow PEP 8 conventions
+- Type hints required
+- Use async/await for OpenCode SDK calls
+- See `AGENTS.md` for detailed guidelines
 
 ## Contributing
 
-1. Follow the feature_list.json for implementation priorities
-2. Write tests for new features
-3. Ensure responsive design
-4. Maintain accessibility standards
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `pytest`
+5. Submit a pull request
 
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Credits
+
+- Built on [OpenCode](https://opencode.ai) by SST
+- Uses [Anthropic Claude](https://anthropic.com) and [OpenRouter](https://openrouter.ai)
+- Python SDK: [opencode-ai](https://pypi.org/project/opencode-ai/)
