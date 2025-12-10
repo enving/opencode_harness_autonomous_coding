@@ -180,7 +180,7 @@ async def send_prompt(
                 model_id="claude-3-5-sonnet-20241022",
                 provider_id="anthropic",
                 parts=[{"type": "text", "text": message}],
-                extra_body={"max_tokens": 4096}
+                extra_body={"max_tokens": 1000}
             )
         else:
             # Use specified model (format: provider/model or provider/vendor/model)
