@@ -173,7 +173,7 @@ async def run_autonomous_agent(
         
         # After first iteration with initializer, switch to coding prompt
         if iteration == 1 and used_initializer:
-            print("\n🔄 Switching from INITIALIZER to CODING prompt for next iteration")
+            print("\nSwitching from INITIALIZER to CODING prompt for next iteration")
             prompt = get_coding_prompt()
             
             # Check if feature_list.json was created
@@ -181,9 +181,9 @@ async def run_autonomous_agent(
                 try:
                     import json
                     features = json.loads(tests_file.read_text())
-                    print(f"✅ feature_list.json created with {len(features)} features")
+                    print(f"feature_list.json created with {len(features)} features")
                 except Exception as e:
-                    print(f"⚠️  WARNING: Could not validate feature_list.json: {e}")
+                    print(f"WARNING: Could not validate feature_list.json: {e}")
 
         # Handle status
         if status == "continue":

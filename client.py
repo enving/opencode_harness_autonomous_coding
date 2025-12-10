@@ -228,7 +228,7 @@ async def send_prompt(
             # ALWAYS prefer FREE models!
             if openrouter_key:
                 # Use FREE Mistral model
-                print("🆓 Using FREE OpenRouter Mistral model")
+                print("Using FREE OpenRouter Mistral model")
                 result = await client.session.chat(
                     session_id,
                     model_id="mistralai/mistral-7b-instruct:free",
@@ -238,8 +238,8 @@ async def send_prompt(
                 )
             elif anthropic_key:
                 # WARNING: This is PAID tier!
-                print("⚠️  WARNING: Using PAID Claude model - costs apply!")
-                print("💡 TIP: Set OPENROUTER_API_KEY to use free models instead")
+                print("WARNING: Using PAID Claude model - costs apply!")
+                print("TIP: Set OPENROUTER_API_KEY to use free models instead")
                 result = await client.session.chat(
                     session_id,
                     model_id="claude-3-5-sonnet-20241022",
@@ -249,7 +249,7 @@ async def send_prompt(
                 )
             else:
                 # Fallback to OpenCode free model
-                print("🆓 Using OpenCode free model")
+                print("Using OpenCode free model")
                 result = await client.session.chat(
                     session_id,
                     model_id="gpt-4o-mini",
