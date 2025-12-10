@@ -12,36 +12,59 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Find OpenCode container
-$container = docker ps --filter "ancestor=ghcr.io/sst/opencode" --format "{{.ID}}" 2>&1
+$container = docker ps --format "{{.ID}} {{.Names}}" | Where-Object { $_ -match "opencode" } | ForEach-Object { ($_ -split " ")[0] }
 if (-not $container) {
     Write-Host "❌ OpenCode container not found" -ForegroundColor Red
     Write-Host "Start it with:" -ForegroundColor Yellow
-    Write-Host "docker run -d -p 4096:4096 --name opencode-server ghcr.io/sst/opencode opencode serve --port 4096 --hostname 0.0.0.0" -ForegroundColor Cyan
+    $startCmd = 'docker run -d -p 4096:4096 --name opencode-server -e OPENROUTER_API_KEY="YOUR_KEY" ghcr.io/sst/opencode opencode serve --port 4096 --hostname 0.0.0.0'
+    Write-Host $startCmd -ForegroundColor Cyan
     exit 1
 }
 
 Write-Host "✅ Found OpenCode container: $container" -ForegroundColor Green
 
-# Try to extract API key from container
+# Try to extract API key from container environment
 Write-Host "`n🔑 Trying to extract API key from container..." -ForegroundColor Cyan
 
 $apiKey = $null
 
-# Try /tmp/api-key
-$apiKey = docker exec $container cat /tmp/api-key 2>$null
-if ($apiKey) {
-    Write-Host "✅ Found API key in /tmp/api-key" -ForegroundColor Green
+# Try environment variable first
+try {
+    $envKey = docker exec $container printenv OPENROUTER_API_KEY 2>$null
+    if ($envKey -and $envKey.Trim()) {
+        $apiKey = $envKey.Trim()
+        Write-Host "✅ Found API key in environment variable" -ForegroundColor Green
+    }
+} catch {
+    # Ignore errors
 }
 
-# If not found, try .opencode.json
+# Try /tmp/api-key
 if (-not $apiKey) {
-    $opcodeJson = docker exec $container cat /workspace/.opencode.json 2>$null
-    if ($opcodeJson) {
-        $config = $opcodeJson | ConvertFrom-Json
-        if ($config.apiKey) {
-            $apiKey = $config.apiKey
-            Write-Host "✅ Found API key in .opencode.json" -ForegroundColor Green
+    try {
+        $fileKey = docker exec $container cat /tmp/api-key 2>$null
+        if ($fileKey -and $fileKey.Trim()) {
+            $apiKey = $fileKey.Trim()
+            Write-Host "✅ Found API key in /tmp/api-key" -ForegroundColor Green
         }
+    } catch {
+        # Ignore errors
+    }
+}
+
+# Try .opencode.json
+if (-not $apiKey) {
+    try {
+        $opcodeJson = docker exec $container cat /workspace/.opencode.json 2>$null
+        if ($opcodeJson) {
+            $config = $opcodeJson | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($config.apiKey) {
+                $apiKey = $config.apiKey
+                Write-Host "✅ Found API key in .opencode.json" -ForegroundColor Green
+            }
+        }
+    } catch {
+        # Ignore errors
     }
 }
 
