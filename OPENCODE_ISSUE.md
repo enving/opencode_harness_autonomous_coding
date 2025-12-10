@@ -44,6 +44,22 @@ The OpenCode server ignores configuration and selects different models:
 - `google/gemini-3-pro-preview` (paid, $0.15/request)
 - `claude-haiku-4.5` via Amazon Bedrock (paid, $0.01-0.02/request)
 
+**Evidence from Docker container inspection:**
+
+```bash
+# Environment variable explicitly set:
+$ docker exec opencode-server env | grep MODEL
+DEFAULT_MODEL=openrouter/meta-llama/llama-3.1-8b-instruct:free
+
+# But session data shows different model was used:
+$ docker exec opencode-server cat /root/.local/share/opencode/storage/message/.../msg_*.json
+{
+  "modelID": "google/gemini-3-pro-preview",
+  "providerID": "openrouter",
+  "cost": 0.014294
+}
+```
+
 **Result:** Unexpected costs accumulate rapidly in long-running autonomous sessions.
 
 ### Evidence
