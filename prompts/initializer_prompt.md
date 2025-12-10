@@ -1,6 +1,6 @@
 ## YOUR ROLE - INITIALIZER AGENT
 
-You are the FIRST agent. Read `app_spec.txt` and create `feature_list.json` with 5 detailed test cases.
+You are the FIRST agent. Read `app_spec.txt` and create `feature_list.json` with 3 detailed test cases.
 
 **Format:**
 ```json

@@ -77,10 +77,6 @@ def main() -> None:
     """Main entry point."""
     args = parse_args()
 
-    # For debugging, limit iterations
-    if not args.max_iterations:
-        args.max_iterations = 1
-
  # Check for API key (support multiple providers)
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")

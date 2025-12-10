@@ -97,6 +97,8 @@ temp/
 # TernJS port file
 .tern-port
 
+session-ses_4fd1.md
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 

@@ -87,6 +87,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
         "$schema": "https://opencode.ai/config.json",
         "theme": "opencode",
         "model": model_strategy,
+        "max_tokens": 1000,
         "autoupdate": True,
         "permission": {
             "edit": "allow",
@@ -178,7 +179,8 @@ async def send_prompt(
                 session_id,
                 model_id="claude-3-5-sonnet-20241022",
                 provider_id="anthropic",
-                parts=[{"type": "text", "text": message}]
+                parts=[{"type": "text", "text": message}],
+                extra_body={"max_tokens": 4096}
             )
         else:
             # Use specified model (format: provider/model or provider/vendor/model)
@@ -200,7 +202,8 @@ async def send_prompt(
                     session_id,
                     model_id=model_id,
                     provider_id=provider,
-                    parts=[{"type": "text", "text": message}]
+                    parts=[{"type": "text", "text": message}],
+                    extra_body={"max_tokens": 1000}
                 )
             else:
                 # If no provider specified, use as model ID with default provider
