@@ -81,27 +81,27 @@ Implement the chosen feature thoroughly:
 3. Fix any issues discovered
 4. Verify the feature works end-to-end
 
-### STEP 6: VERIFY WITH BROWSER AUTOMATION
+### STEP 6: VERIFY WITH AVAILABLE TOOLS
 
-**CRITICAL:** You MUST verify features through the actual UI.
+**CRITICAL:** You MUST verify features thoroughly using available tools.
 
-Use browser automation tools:
-- Navigate to the app in a real browser
-- Interact like a human user (click, type, scroll)
-- Take screenshots at each step
-- Verify both functionality AND visual appearance
+Use the following verification methods:
+- **Backend Testing:** Use curl commands to test API endpoints
+- **File Verification:** Check that files are created/modified correctly
+- **Process Testing:** Start servers and verify they respond
+- **Code Review:** Read and verify implementation matches requirements
 
 **DO:**
-- Test through the UI with clicks and keyboard input
-- Take screenshots to verify visual appearance
-- Check for console errors in browser
-- Verify complete user workflows end-to-end
+- Test API endpoints with curl commands
+- Verify file contents and structure
+- Check server startup and responses
+- Review code for correctness
+- Run any available test scripts
 
 **DON'T:**
-- Only test with curl commands (backend testing alone is insufficient)
-- Use JavaScript evaluation to bypass UI (no shortcuts)
-- Skip visual verification
-- Mark tests passing without thorough verification
+- Skip verification entirely
+- Mark tests passing without thorough checking
+- Assume code works without testing
 
 ### STEP 7: UPDATE feature_list.json (CAREFULLY!)
 

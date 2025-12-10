@@ -1,52 +1,40 @@
 #!/bin/bash
+set -e
 
-# Initialize git
+echo "Initializing project..."
+
+# Initialize git if not already
 if [ ! -d ".git" ]; then
-    git init
-    echo "Git repository initialized."
-else
-    echo "Git repository already exists."
+  git init
+  echo "Git initialized."
 fi
 
-# Create server directory
-if [ ! -d "server" ]; then
-    mkdir server
-    cd server
-    npm init -y
-    # Install backend dependencies mentioned in spec
-    npm install express better-sqlite3 cors dotenv
-    # Create basic server file
-    echo "const express = require('express');" > index.js
-    echo "const app = express();" >> index.js
-    echo "const port = 3001;" >> index.js
-    echo "const cors = require('cors');" >> index.js
-    echo "" >> index.js
-    echo "app.use(cors());" >> index.js
-    echo "app.use(express.json());" >> index.js
-    echo "" >> index.js
-    echo "app.get('/api/health', (req, res) => res.json({ status: 'ok' }));" >> index.js
-    echo "" >> index.js
-    echo "app.listen(port, () => {" >> index.js
-    echo "  console.log(\`Server running on port \${port}\`);" >> index.js
-    echo "});" >> index.js
-    cd ..
-    echo "Server setup complete."
-else
-    echo "Server directory already exists."
-fi
+# Create .gitignore
+cat <<EOF > .gitignore
+node_modules
+dist
+.env
+.DS_Store
+coverage
+EOF
 
-# Create client directory
+# Client Setup
 if [ ! -d "client" ]; then
-    # scaffolding vite react app
-    npm create vite@latest client -- --template react
-    cd client
-    # Install frontend dependencies mentioned in spec
-    npm install
-    npm install tailwindcss postcss autoprefixer react-router-dom react-markdown
-    npx tailwindcss init -p
-    
-    # Configure Tailwind
-    cat > tailwind.config.js <<EOF
+  echo "Setting up client..."
+  # Use Vite to scaffold React + TypeScript project
+  # We use a template to avoid interactive prompts
+  npm create vite@latest client -- --template react-ts
+  
+  cd client
+  echo "Installing client dependencies..."
+  npm install
+  
+  # Install Tailwind CSS and dependencies
+  npm install -D tailwindcss postcss autoprefixer
+  npx tailwindcss init -p
+  
+  # Configure Tailwind Content
+  cat > tailwind.config.js <<EOF
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -56,7 +44,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'claude-accent': '#CC785C',
+         'claude-accent': '#CC785C',
       }
     },
   },
@@ -64,24 +52,90 @@ export default {
 }
 EOF
 
-    # Add Tailwind directives to index.css
-    echo "@tailwind base;" > src/index.css
-    echo "@tailwind components;" >> src/index.css
-    echo "@tailwind utilities;" >> src/index.css
+  # Add Tailwind directives
+  echo "@tailwind base;" > src/index.css
+  echo "@tailwind components;" >> src/index.css
+  echo "@tailwind utilities;" >> src/index.css
 
-    cd ..
-    echo "Client setup complete."
-else
-    echo "Client directory already exists."
+  # Install other frontend dependencies mentioned in spec
+  npm install react-router-dom react-markdown framer-motion lucide-react clsx tailwind-merge date-fns prismjs react-syntax-highlighter katex
+  
+  cd ..
 fi
 
-# Create .gitignore
-cat > .gitignore <<EOF
-node_modules
-.env
-dist
-.DS_Store
-*.log
+# Server Setup
+if [ ! -d "server" ]; then
+  echo "Setting up server..."
+  mkdir server
+  cd server
+  npm init -y
+  
+  # Install backend dependencies
+  echo "Installing server dependencies..."
+  npm install express cors better-sqlite3 dotenv
+  npm install -D nodemon ts-node typescript @types/express @types/node @types/cors @types/better-sqlite3
+  
+  # Create basic server structure
+  mkdir -p src/routes src/controllers src/models src/middleware src/db
+  
+  # Create basic index.ts
+  cat <<EOF > src/index.ts
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { db } from './db/database';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+app.use(cors());
+app.use(express.json());
+
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.listen(PORT, () => {
+  console.log(\`Server running on port \${PORT}\`);
+});
 EOF
 
-echo "Project initialization complete."
+  # Create database init
+  cat <<EOF > src/db/database.ts
+import Database from 'better-sqlite3';
+import path from 'path';
+
+const dbPath = path.join(__dirname, '../../claude_clone.sqlite');
+export const db = new Database(dbPath);
+
+console.log('Connected to SQLite database at', dbPath);
+EOF
+
+  # Create custom tsconfig.json for server
+  cat <<EOF > tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+EOF
+
+  cd ..
+fi
+
+# Create README
+echo "# Claude Clone" > README.md
+
+echo "Initialization complete."

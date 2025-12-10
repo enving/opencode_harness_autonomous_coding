@@ -5,6 +5,23 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+legacy_claude_code/
+migration-docs/
+
+.github/
+.claude/
+-p/
+__pycache__/
+test5/
+test4/
+test3/
+test2/
+test1/
+
+AGENTS.md
+claude-progress.txt
+claude_settings.json
+
 opencode-sdk-python-main/
 docs/
 
