@@ -34,15 +34,15 @@ def read_api_key_from_file() -> Optional[str]:
                 content = path.read_text().strip()
                 # If it's a JSON file, extract the key
                 if path.suffix == ".json":
-                    config = json.loads(content)
-                    if "apiKey" in config:
-                        print(f"✅ Found API key in {path}")
-                        return config["apiKey"]
+                     config = json.loads(content)
+                     if "apiKey" in config:
+                         print(f"[OK] Found API key in {path}")
+                         return config["apiKey"]
                 else:
-                    print(f"✅ Found API key in {path}")
+                    print(f"[OK] Found API key in {path}")
                     return content
             except Exception as e:
-                print(f"⚠️  Could not read API key from {path}: {e}")
+                print(f"[WARN] Could not read API key from {path}: {e}")
     
     return None
 
@@ -83,7 +83,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     
     # If still no key, show error
     if not anthropic_key and not openrouter_key and not opencode_key:
-        print("❌ ERROR: No API keys found!")
+        print("[ERROR] No API keys found!")
         print("\nOptions:")
         print("  1. Set environment variable:")
         print("     $env:OPENROUTER_API_KEY='sk-or-v1-...'")
@@ -95,32 +95,32 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     if model == "auto":
         if openrouter_key:
             model_strategy = "openrouter/meta-llama/llama-3.1-8b-instruct:free"  # Free OpenRouter model
-            print(f"🚀 Using free OpenRouter Llama 3.1")
+            print(f"[INFO] Using free OpenRouter Llama 3.1")
         elif anthropic_key:
             model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
-            print(f"🤖 Using Claude Sonnet 3.5 (paid tier)")
+            print(f"[INFO] Using Claude Sonnet 3.5 (paid tier)")
         elif opencode_key:
             model_strategy = "opencode/gpt-4o-mini"  # OpenCode free model
-            print(f"🎯 Using OpenCode GPT-4o Mini (free)")
+            print(f"[INFO] Using OpenCode GPT-4o Mini (free)")
         else:
             model_strategy = "auto"  # Fallback to auto-selection
-            print(f"🎯 Using auto-selected model")
+            print(f"[INFO] Using auto-selected model")
     else:
         # Use specified model
         model_strategy = model
-        print(f"🎯 Using specified model: {model}")
+        print(f"[INFO] Using specified model: {model}")
     
-    print(f"📋 Model strategy: {model_strategy}")
+    print(f"[INFO] Model strategy: {model_strategy}")
     
     # Create OpenCode client
     try:
         # Check for custom base URL
         base_url = os.environ.get("OPENCODE_BASE_URL", "http://localhost:4096")
         client = AsyncOpencode(base_url=base_url, timeout=1200.0)
-        print(f"✅ OpenCode client created with URL: {base_url}")
-        print("💡 Make sure OpenCode server is running on this address")
+        print(f"[OK] OpenCode client created with URL: {base_url}")
+        print("[INFO] Make sure OpenCode server is running on this address")
     except Exception as e:
-        print(f"❌ Failed to create OpenCode client: {e}")
+        print(f"[ERROR] Failed to create OpenCode client: {e}")
         return None
     
     # Ensure project directory exists
@@ -152,7 +152,7 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     with open(config_file, "w") as f:
         json.dump(opencode_config, f, indent=2)
 
-    print(f"✅ Created OpenCode settings at {config_file}")
+    print(f"[OK] Created OpenCode settings at {config_file}")
     print(f"   - Filesystem restricted to: {project_dir.resolve()}")
     print("   - Bash commands restricted to allowlist (see security.py)")
     print(f"   - Model strategy: {model_strategy}")

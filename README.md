@@ -1,5 +1,17 @@
 # OpenCode Harness - Autonomous Coding Agent
 
+⚠️ **PROJECT DISCONTINUED** ⚠️
+
+This project has been discontinued due to critical issues with the OpenCode SDK's model selection behavior. Despite explicit configuration for free models, the OpenCode server consistently ignores the `model` parameter in `.opencode.json` and automatically selects expensive models (Gemini 3 Pro, Claude Haiku via Amazon Bedrock), resulting in unexpected costs.
+
+**Root Cause:** The OpenCode SDK/Server has its own model selection logic that overrides client-side configuration, making cost control impossible for autonomous long-running agents.
+
+**See Issue:** [Link to GitHub issue will be added]
+
+---
+
+## Original Description
+
 An autonomous coding agent that uses OpenCode (Claude-powered IDE) to automatically build applications from specifications. The agent iteratively implements features, runs tests, and refines code until the application is complete.
 
 ## Features
@@ -133,6 +145,10 @@ Configured automatically based on model:
 - Free models: 1000 tokens
 - Paid models: 4096 tokens
 
+
+# new
+docker run -d -p 4096:4096 --name opencode-server -e OPENROUTER_API_KEY="yourkey" -e DEFAULT_MODEL="openrouter/mistralai/mistral-7b-instruct:free" ghcr.io/sst/opencode opencode serve --port 4096 --hostname 0.0.0.0
+
 ### Security
 
 Edit `security.py` to customize:
@@ -245,8 +261,79 @@ pytest --cov=. --cov-report=html
 
 MIT License - see LICENSE file for details.
 
+## Why This Project Was Discontinued
+
+### The Problem
+
+Despite configuring the OpenCode client with explicit free model settings:
+
+```json
+{
+  "model": "openrouter/meta-llama/llama-3.1-8b-instruct:free",
+  "max_tokens": 200,
+  ...
+}
+```
+
+And passing model parameters via the SDK:
+
+```python
+result = await client.session.chat(
+    session_id,
+    model_id="mistralai/mistral-7b-instruct:free",
+    provider_id="openrouter",
+    parts=[{"type": "text", "text": message}],
+    extra_body={"max_tokens": 200}
+)
+```
+
+**The OpenCode server consistently ignored these settings** and selected expensive models:
+- `google/gemini-3-pro-preview` ($0.15/request)
+- `claude-haiku-4.5` via Amazon Bedrock ($0.01-0.02/request)
+
+### Evidence
+
+From OpenRouter usage logs during testing:
+```
+Dec 10, 08:56 PM - Gemini 3 Pro Preview - 19,849 tokens - $0.152
+Dec 10, 08:56 PM - Claude Haiku 4.5 - 12,290 tokens - $0.0125
+Dec 10, 08:54 PM - Gemini 3 Pro Preview - 12,617 tokens - $0.0136
+Dec 10, 08:54 PM - Claude Haiku 4.5 - 1,862 tokens - $0.00192
+...
+```
+
+**Result:** A single 10-minute test session cost ~$0.30-0.50 instead of $0.00 (free tier).
+
+### Attempted Solutions
+
+1. ✅ Configured `.opencode.json` with free model
+2. ✅ Passed explicit model parameters via SDK
+3. ✅ Set environment variables (`DEFAULT_MODEL`, `OPENROUTER_API_KEY`)
+4. ✅ Used Docker with environment configuration
+5. ❌ **None of these approaches prevented the server from selecting paid models**
+
+### Conclusion
+
+The OpenCode SDK is unsuitable for cost-sensitive autonomous agents because:
+- Model selection is controlled server-side, not client-side
+- Configuration files and SDK parameters are ignored
+- No way to enforce free-tier models
+- Unexpected costs accumulate rapidly in long-running sessions
+
+### Alternative Approaches
+
+For autonomous coding agents with cost control, consider:
+1. **Direct API Integration** - Use OpenRouter/Anthropic APIs directly without OpenCode
+2. **Custom Harness** - Implement your own tool execution layer (~200 lines)
+3. **LangChain/LangGraph** - Use established frameworks with better cost controls
+
+See the [Anthropic Guide on Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) for implementation patterns that don't require expensive SDKs.
+
+---
+
 ## Credits
 
-- Built on [OpenCode](https://opencode.ai) by SST
-- Uses [Anthropic Claude](https://anthropic.com) and [OpenRouter](https://openrouter.ai)
+- Originally built on [OpenCode](https://opencode.ai) by SST
+- Inspired by [Anthropic's Long-Running Agents Guide](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
+- Uses [OpenRouter](https://openrouter.ai) for multi-model access
 - Python SDK: [opencode-ai](https://pypi.org/project/opencode-ai/)

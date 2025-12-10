@@ -144,11 +144,11 @@ async def run_autonomous_agent(
 
     # Create or get session
     if is_first_run:
-        print("📋 Using INITIALIZER prompt for first session")
+        print("[INFO] Using INITIALIZER prompt for first session")
         session_id = await create_session(client, "Initializer Agent - Project Setup", project_dir)
         prompt = get_initializer_prompt()
     else:
-        print("💻 Using CODING prompt for continuation")
+        print("[INFO] Using CODING prompt for continuation")
         session_id = await create_session(client, "Coding Agent - Feature Implementation", project_dir)
         prompt = get_coding_prompt()
 
