@@ -7,8 +7,16 @@ Functions for creating and configuring OpenCode Python SDK client.
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Optional
+
+# Fix Windows console encoding for Unicode characters
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except:
+        pass  # Ignore if reconfigure not available
 
 from opencode_ai import AsyncOpencode
 
@@ -91,20 +99,20 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
         print("\n  3. Put key in .opencode.json as 'apiKey'")
         return None
     
-    # Determine model strategy
+    # Determine model strategy based on available providers
+    # Provider priorities: opencode (FREE) > mistral (cheap) > anthropic (PAID)
     if model == "auto":
-        if openrouter_key:
-            model_strategy = "openrouter/meta-llama/llama-3.1-8b-instruct:free"  # Free OpenRouter model
-            print(f"[INFO] Using free OpenRouter Llama 3.1")
+        # ALWAYS prefer FREE OpenCode models!
+        if opencode_key or True:  # OpenCode has public models
+            model_strategy = "opencode/big-pickle"  # FREE OpenCode model
+            print(f"[INFO] Using FREE OpenCode 'big-pickle' model")
         elif anthropic_key:
-            model_strategy = "anthropic/claude-3-5-sonnet-20241022"  # Default Claude model
-            print(f"[INFO] Using Claude Sonnet 3.5 (paid tier)")
-        elif opencode_key:
-            model_strategy = "opencode/gpt-4o-mini"  # OpenCode free model
-            print(f"[INFO] Using OpenCode GPT-4o Mini (free)")
+            model_strategy = "anthropic/claude-3-5-sonnet-20241022"
+            print(f"[WARNING] Using Claude Sonnet 3.5 (PAID tier - costs apply!)")
         else:
-            model_strategy = "auto"  # Fallback to auto-selection
-            print(f"[INFO] Using auto-selected model")
+            # Fallback to cheapest Mistral
+            model_strategy = "mistral/ministral-3b-latest"
+            print(f"[INFO] Using Mistral 3B (very cheap: $0.04/M tokens)")
     else:
         # Use specified model
         model_strategy = model
@@ -128,11 +136,19 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
 
     # Create OpenCode configuration file
     config_file = project_dir / ".opencode.json"
+    
+    # Parse model strategy into provider and model
+    if "/" in model_strategy:
+        provider, model_id = model_strategy.split("/", 1)
+    else:
+        provider = "opencode"
+        model_id = model_strategy
+    
     opencode_config = {
         "$schema": "https://opencode.ai/config.json",
         "theme": "opencode",
-        "model": model_strategy,
-        "max_tokens": 200,  # Reduced to minimize costs
+        "provider": provider,  # SDK uses separate provider field
+        "model": model_id,      # Just the model ID, not provider/model
         "autoupdate": True,
         "permission": {
             "edit": "allow",
@@ -155,7 +171,8 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
     print(f"[OK] Created OpenCode settings at {config_file}")
     print(f"   - Filesystem restricted to: {project_dir.resolve()}")
     print("   - Bash commands restricted to allowlist (see security.py)")
-    print(f"   - Model strategy: {model_strategy}")
+    print(f"   - Provider: {provider}")
+    print(f"   - Model: {model_id}")
     print()
 
     return client
@@ -223,82 +240,65 @@ async def send_prompt(
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
         opencode_key = os.environ.get("OPENCODE_API_KEY")
         
-        # Handle model selection
+        # Handle model selection - use SDK-compatible providers
         if model == "auto":
-            # ALWAYS prefer FREE models!
-            if openrouter_key:
-                # Use FREE Mistral model
-                print("Using FREE OpenRouter Mistral model")
-                result = await client.session.chat(
-                    session_id,
-                    model_id="mistralai/mistral-7b-instruct:free",
-                    provider_id="openrouter",
-                    parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 200}
-                )
-            elif anthropic_key:
-                # WARNING: This is PAID tier!
-                print("WARNING: Using PAID Claude model - costs apply!")
-                print("TIP: Set OPENROUTER_API_KEY to use free models instead")
-                result = await client.session.chat(
-                    session_id,
-                    model_id="claude-3-5-sonnet-20241022",
-                    provider_id="anthropic",
-                    parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 200}  # Reduced from 1000
-                )
-            else:
-                # Fallback to OpenCode free model
-                print("Using OpenCode free model")
-                result = await client.session.chat(
-                    session_id,
-                    model_id="gpt-4o-mini",
-                    provider_id="opencode",
-                    parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 200}  # Reduced from 500
-                )
+            # ALWAYS prefer FREE OpenCode models!
+            print("[OK] Using FREE OpenCode model (big-pickle)")
+            result = await client.session.chat(
+                session_id,
+                model_id="big-pickle",  # Free OpenCode model
+                provider_id="opencode",
+                parts=[{"type": "text", "text": message}],
+                extra_body={"max_tokens": 8000}  # Reasonable for free tier
+            )
         else:
-            # Use specified model (format: provider/model or provider/vendor/model)
+            # Use specified model (format: provider/model)
+            # Supported providers: mistral, anthropic, opencode
             if "/" in model:
-                parts_list = model.split("/")
-                if len(parts_list) == 2:
-                    # Format: provider/model (e.g., anthropic/claude-sonnet-4-5-20250929)
-                    provider, model_id = parts_list
-                elif len(parts_list) == 3:
-                    # Format: provider/vendor/model (e.g., openrouter/anthropic/claude-3.5-sonnet)
-                    provider, vendor, model_name = parts_list
-                    model_id = f"{vendor}/{model_name}"
-                else:
-                    # Fallback: use as-is
-                    provider = "openrouter"
-                    model_id = model
+                parts_list = model.split("/", 1)  # Split only on first /
+                provider, model_id = parts_list
                 
-                # Force free tier by setting very low max_tokens
-                extra_body = {"max_tokens": 200}  # Reduced from 500
-                if "free" in model_id.lower():
-                    extra_body["max_tokens"] = 200  # Keep at 200 for free models
+                # Validate provider (must be one of: mistral, anthropic, opencode)
+                valid_providers = ["mistral", "anthropic", "opencode"]
+                if provider not in valid_providers:
+                    print(f"[WARN] Invalid provider '{provider}'. Using 'opencode' instead.")
+                    print(f"[INFO] Valid providers: {', '.join(valid_providers)}")
+                    provider = "opencode"
+                    model_id = "big-pickle"
+                
+                # Set max_tokens based on cost
+                if provider == "opencode":
+                    max_tokens = 8000  # Free tier - generous
+                    print(f"[OK] Using FREE {provider} model: {model_id}")
+                elif provider == "mistral":
+                    max_tokens = 4000  # Cheap but not free
+                    print(f"[OK] Using Mistral model: {model_id} (low cost)")
+                else:  # anthropic
+                    max_tokens = 2000  # Expensive - limit usage
+                    print(f"[WARNING] Using PAID Anthropic model: {model_id}")
+                    print(f"[WARNING] This will incur costs! Consider using opencode/big-pickle instead.")
 
                 result = await client.session.chat(
                     session_id,
                     model_id=model_id,
                     provider_id=provider,
                     parts=[{"type": "text", "text": message}],
-                    extra_body=extra_body
+                    extra_body={"max_tokens": max_tokens}
                 )
             else:
-                # If no provider specified, use as model ID with default provider
-                print("⚠️  Using default provider with custom model")
+                # No provider specified - assume it's an opencode model ID
+                print(f"[WARN] No provider specified. Assuming opencode/{model}")
                 result = await client.session.chat(
                     session_id,
                     model_id=model,
-                    provider_id="openrouter",
+                    provider_id="opencode",
                     parts=[{"type": "text", "text": message}],
-                    extra_body={"max_tokens": 200}  # Reduced from 2000
+                    extra_body={"max_tokens": 8000}
                 )
         
         return result
     except Exception as e:
-        print(f"❌ Failed to send prompt: {type(e).__name__}: {e}")
+        print(f"[ERROR] Failed to send prompt: {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
         raise

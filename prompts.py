@@ -23,9 +23,18 @@ def get_initializer_prompt() -> str:
     return load_prompt("initializer_prompt")
 
 
-def get_coding_prompt() -> str:
-    """Load the coding agent prompt."""
-    return load_prompt("coding_prompt")
+def get_coding_prompt(project_dir: Path = None) -> str:
+    """Load the coding agent prompt with project directory context."""
+    prompt = load_prompt("coding_prompt")
+    
+    # Add project directory context if provided
+    if project_dir:
+        context = f"\n\n**IMPORTANT: Your working directory is: `{project_dir.resolve()}`**\n"
+        context += f"All files (app_spec.txt, feature_list.json, etc.) are in this directory.\n"
+        context += f"Use this path when reading/writing files.\n\n"
+        prompt = context + prompt
+    
+    return prompt
 
 
 def copy_spec_to_project(project_dir: Path) -> None:

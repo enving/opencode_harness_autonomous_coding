@@ -8,26 +8,23 @@ This is a FRESH context window - you have no memory of previous sessions.
 Start by orienting yourself:
 
 ```bash
-# 1. See your working directory
-pwd
+# 1. List files to understand project structure
+dir
+# OR on Unix: ls -la
 
-# 2. List files to understand project structure
-ls -la
+# 2. Read the project specification to understand what you're building
+# Use the Read tool to read app_spec.txt
 
-# 3. Read the project specification to understand what you're building
-cat app_spec.txt
+# 3. Read the feature list to see all work  
+# Use the Read tool to read feature_list.json
 
-# 4. Read the feature list to see all work
-cat feature_list.json | head -50
+# 4. Read progress notes from previous sessions
+# Use the Read tool to read claude-progress.txt (if it exists)
 
-# 5. Read progress notes from previous sessions
-cat claude-progress.txt
-
-# 6. Check recent git history
+# 5. Check recent git history
 git log --oneline -20
 
-# 7. Count remaining tests
-cat feature_list.json | grep '"passes": false' | wc -l
+# 6. Count remaining tests by reading feature_list.json and counting "passes": false
 ```
 
 Understanding the `app_spec.txt` is critical - it contains the full requirements

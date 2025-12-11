@@ -150,7 +150,7 @@ async def run_autonomous_agent(
     else:
         print("[INFO] Using CODING prompt for continuation")
         session_id = await create_session(client, "Coding Agent - Feature Implementation", project_dir)
-        prompt = get_coding_prompt()
+        prompt = get_coding_prompt(project_dir)
 
     # Main loop
     iteration = 0
@@ -174,7 +174,7 @@ async def run_autonomous_agent(
         # After first iteration with initializer, switch to coding prompt
         if iteration == 1 and used_initializer:
             print("\nSwitching from INITIALIZER to CODING prompt for next iteration")
-            prompt = get_coding_prompt()
+            prompt = get_coding_prompt(project_dir)
             
             # Check if feature_list.json was created
             if tests_file.exists():
