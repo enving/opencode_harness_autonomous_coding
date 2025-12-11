@@ -6,6 +6,7 @@ Core agent interaction functions for running autonomous coding sessions with Ope
 """
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -139,8 +140,17 @@ async def run_autonomous_agent(
         print("Continuing existing project")
         print_progress_summary(project_dir)
 
+    # Change to project directory so OpenCode recognizes the correct project context
+    original_cwd = os.getcwd()
+    print(f"[INFO] Temporarily changing working directory to: {project_dir.resolve()}")
+    os.chdir(project_dir)
+
     # Create OpenCode client
     client = create_client(project_dir, model)
+
+    # Change back to original directory for file operations
+    os.chdir(original_cwd)
+    print(f"[INFO] Changed back to working directory: {original_cwd}")
 
     # Create or get session
     if is_first_run:
