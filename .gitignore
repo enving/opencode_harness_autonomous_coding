@@ -5,6 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+.env
+
 legacy_claude_code/
 migration-docs/
 
@@ -18,12 +20,9 @@ test3/
 test2/
 test1/
 
-AGENTS.md
 claude-progress.txt
 claude_settings.json
 
-opencode-sdk-python-main/
-docs/
 
 # Build outputs
 dist/

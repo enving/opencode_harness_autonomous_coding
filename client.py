@@ -160,8 +160,14 @@ def create_client(project_dir: Path, model: str = "auto") -> Optional[AsyncOpenc
         "security": {
             "bash_allowlist": [
                 "ls", "cat", "head", "tail", "wc", "grep",
-                "npm", "node", "git", "ps", "lsof", "sleep", "pkill"
+                "npm", "node", "npx", "git", "ps", "lsof", "sleep", "pkill"
             ]
+        },
+        "mcpServers": {
+            "puppeteer": {
+                "command": "npx",
+                "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+            }
         }
     }
 

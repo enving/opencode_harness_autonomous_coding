@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "opencode",
+  "provider": "opencode",
+  "model": "big-pickle",
+  "autoupdate": true,
+  "permission": {
+    "edit": "allow",
+    "bash": "ask",
+    "webfetch": "deny",
+    "doom_loop": "ask",
+    "external_directory": "ask"
+  },
+  "security": {
+    "bash_allowlist": [
+      "ls",
+      "cat",
+      "head",
+      "tail",
+      "wc",
+      "grep",
+      "npm",
+      "node",
+      "npx",
+      "git",
+      "ps",
+      "lsof",
+      "sleep",
+      "pkill"
+    ]
+  },
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    }
+  }
+}

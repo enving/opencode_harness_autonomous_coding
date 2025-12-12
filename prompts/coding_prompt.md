@@ -19,7 +19,7 @@ dir
 # Use the Read tool to read feature_list.json
 
 # 4. Read progress notes from previous sessions
-# Use the Read tool to read claude-progress.txt (if it exists)
+# Use the Read tool to read progress_notes.txt (if it exists)
 
 # 5. Check recent git history
 git log --oneline -20
@@ -138,7 +138,7 @@ git commit -m "Implement [feature name] - verified end-to-end
 
 ### STEP 9: UPDATE PROGRESS NOTES
 
-Update `claude-progress.txt` with:
+Update `progress_notes.txt` with:
 - What you accomplished this session
 - Which test(s) you completed
 - Any issues discovered or fixed
@@ -149,7 +149,7 @@ Update `claude-progress.txt` with:
 
 Before context fills up:
 1. Commit all working code
-2. Update claude-progress.txt
+2. Update progress_notes.txt
 3. Update feature_list.json if tests verified
 4. Ensure no uncommitted changes
 5. Leave app in working state (no broken features)

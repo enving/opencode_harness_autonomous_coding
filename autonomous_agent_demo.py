@@ -99,16 +99,26 @@ def main() -> None:
         print("\n  2. OpenRouter API key (multiple models):")
         print("     $env:OPENCODE_API_KEY='your-api-key-here'")
         print("     Get key from: https://openrouter.ai/")
-        print("\n  3. OpenCode API key (free models):")
-        print("     $env:OPENCODE_API_KEY='your-api-key-here'")
-        print("     Get key from: https://opencode.ai/auth")
-        print("\n  3. OpenCode API key (free models):")
-        print("     $env:OPENCODE_API_KEY='your-api-key-here'")
-        print("     Get key from: https://opencode.ai/auth")
-        return
-
     # Use project directory as specified
-    project_dir = args.project_dir
+    project_dir = args.project_dir.resolve()
+    
+    # CHECK: Warn if project_dir is outside CWD (Docker mount issue)
+    current_dir = Path.cwd().resolve()
+    try:
+        project_dir.relative_to(current_dir)
+    except ValueError:
+        print("\n" + "!" * 80)
+        print("  WARNING: Project directory is outside the current working directory!")
+        print("!" * 80)
+        print(f"  Current: {current_dir}")
+        print(f"  Project: {project_dir}")
+        print()
+        print("  If you are running OpenCode via Docker, it can likely ONLY see files")
+        print("  inside the current directory (mounted as /app/workspace or similar).")
+        print("  The server will fail to find/launch this project.")
+        print()
+        print("  RECOMMENDATION: Use a subdirectory, e.g. './projects/my_project'")
+        print("!" * 80 + "\n")
 
     # Run the agent
     try:

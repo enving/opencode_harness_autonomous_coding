@@ -152,16 +152,6 @@ async def run_autonomous_agent(
     os.chdir(original_cwd)
     print(f"[INFO] Changed back to working directory: {original_cwd}")
 
-    # Create or get session
-    if is_first_run:
-        print("[INFO] Using INITIALIZER prompt for first session")
-        session_id = await create_session(client, "Initializer Agent - Project Setup", project_dir)
-        prompt = get_initializer_prompt()
-    else:
-        print("[INFO] Using CODING prompt for continuation")
-        session_id = await create_session(client, "Coding Agent - Feature Implementation", project_dir)
-        prompt = get_coding_prompt(project_dir)
-
     # Main loop
     iteration = 0
     used_initializer = is_first_run  # Track if we started with initializer
@@ -178,13 +168,25 @@ async def run_autonomous_agent(
         # Print session header
         print_session_header(iteration, used_initializer and iteration == 1)
 
+        # Create fresh session for this iteration
+        if is_first_run and iteration == 1:
+            print("[INFO] Using INITIALIZER prompt for first session")
+            session_title = "Initializer Agent - Project Setup"
+            prompt = get_initializer_prompt()
+        else:
+            print("[INFO] Using CODING prompt for fresh context")
+            session_title = f"Coding Agent - Feature Implementation (Iter {iteration})"
+            prompt = get_coding_prompt(project_dir)
+
+        # Create session (fresh context)
+        session_id = await create_session(client, session_title, project_dir)
+
         # Run session
         status, response = await run_agent_session(client, session_id, prompt, project_dir, model)
         
         # After first iteration with initializer, switch to coding prompt
         if iteration == 1 and used_initializer:
             print("\nSwitching from INITIALIZER to CODING prompt for next iteration")
-            prompt = get_coding_prompt(project_dir)
             
             # Check if feature_list.json was created
             if tests_file.exists():

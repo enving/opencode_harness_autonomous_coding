@@ -37,8 +37,8 @@ ALLOWED_COMMANDS = {
     "lsof",
     "sleep",
     "pkill",  # For killing dev servers; validated separately
-    # Script execution
     "init.sh",  # Init scripts; validated separately
+    "npx",      # For running MCP servers like Puppeteer
 }
 
 # Commands that need additional validation even when in the allowlist
